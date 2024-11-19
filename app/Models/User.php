@@ -68,5 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // Send the code to the user's email
         SendVerificationCodeJob::dispatch($this, $verificationCode);
 
+        return $verificationCode;
+
     }
 }

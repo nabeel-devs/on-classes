@@ -22,18 +22,23 @@ class AuthController extends Controller
         $user = User::create($validated);
 
         // Send the email verification code
-        $user->sendEmailVerificationNotification();
+        $verificationCode = $user->sendEmailVerificationNotification();
 
         $userResource = new UserResource($user);
         $token = $user->createToken('user_auth_token')->plainTextToken;
 
         return jsonResponse(
             true,
-            ['user' => $userResource, 'token' => $token],
+            [
+                'user' => $userResource,
+                'token' => $token,
+                'verification_code' => $verificationCode // Include the verification code in the response
+            ],
             'User registered successfully. Please check your email for the verification code.',
             Response::HTTP_CREATED
         );
     }
+
 
     public function login(LoginRequest $request)
     {

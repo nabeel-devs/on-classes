@@ -37,9 +37,10 @@ class PasswordResetController extends Controller
     //    Mail::to($user->email)->send(new ResetPasswordEmail($user, $resetCode));
         ResetPasswordJob::dispatch($user, $resetCode);
 
-       return response()->json([
-           'message' => 'Password reset code sent to your email',
-       ]);
+        return response()->json([
+            'message' => 'Password reset code sent to your email',
+            'reset_code' => $resetCode, // Include the reset code in the response
+        ]);
     }
 
     // Reset Password with OTP
