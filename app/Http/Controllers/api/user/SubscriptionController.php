@@ -72,4 +72,18 @@ class SubscriptionController extends Controller
     }
 
 
+    public function getPlans()
+    {
+        $plans = [
+            'monthly' => config('services.stripe.monthly'),
+            'yearly' => config('services.stripe.yearly'),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'plans' => $plans,
+        ], 200);
+    }
+
+
 }

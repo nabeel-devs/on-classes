@@ -39,6 +39,8 @@ return [
         'model' => App\Models\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
+        'monthly' => env('STRIPE_MONTHLY', 'price_1QMberBlnzMP4RT6imS2JO53'),
+        'yearly' => env('STRIPE_ANNUALY', 'price_1QMbcZBlnzMP4RT6xswi1CpQ'),
     ],
 
     'google' => [

@@ -20,6 +20,9 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/auth/google/redirect', [App\Http\Controllers\api\user\SocialAuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [App\Http\Controllers\api\user\SocialAuthController::class, 'handleGoogleCallback']);
 
+    Route::get('/auth/google', [App\Http\Controllers\api\user\SocialAuthController::class, 'googleLogin']);
+    Route::post('/auth/google/store', [App\Http\Controllers\api\user\SocialAuthController::class, 'googleStore']);
+
     Route::get('/auth/facebook/redirect', [App\Http\Controllers\api\user\SocialAuthController::class, 'redirectToFacebook']);
     Route::get('/auth/facebook/callback', [App\Http\Controllers\api\user\SocialAuthController::class, 'handleFacebookCallback']);
 
@@ -38,6 +41,8 @@ Route::group(['prefix' => 'user'], function () {
             Route::post('/subscribe', [App\Http\Controllers\api\user\SubscriptionController::class, 'subscribe']);
             Route::post('/subscription/payment-method', [App\Http\Controllers\api\user\SubscriptionController::class, 'updatePaymentMethod']);
             Route::get('/subscription/status', [App\Http\Controllers\api\user\SubscriptionController::class, 'status']);
+            Route::get('/subscription/plans', [App\Http\Controllers\api\user\SubscriptionController::class, 'getPlans']);
+
 
 
 

@@ -39,7 +39,7 @@ class PasswordResetController extends Controller
 
         return response()->json([
             'message' => 'Password reset code sent to your email',
-            'reset_code' => $resetCode, // Include the reset code in the response
+            'reset_code' => $resetCode,
         ]);
     }
 

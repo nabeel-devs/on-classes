@@ -81,4 +81,36 @@ class SocialAuthController extends Controller
     }
 
 
+    public function googleStore(Request $request)
+    {
+        $user = User::where('provider_id', $request->provider_id)
+            ->where('provider', $request->provider)
+            ->first();
+
+        if (!$user) {
+            $username = $this->generateUniqueUsername($request->name);
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt(Str::random(8)),
+                'username' => $username,
+                'provider' => $request->provider,
+                'provider_id' => $request->provider_id,
+            ]);
+
+            $user->email_verified_at = now();
+            $user->save();
+        }
+
+        // Generate token or log in user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ]);
+    }
+
+
 }
