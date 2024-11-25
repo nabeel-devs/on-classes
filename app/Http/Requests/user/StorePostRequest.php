@@ -18,7 +18,7 @@ class StorePostRequest extends FormRequest
     {
         return [
             'content' => 'required|string',
-            'type' => 'required|in:text,image,video,product,course',
+            'type' => 'required|in:text,image,video,product,course,reel',
             'who_can_reply' => 'required|in:everyone,verified_accounts,only_community',
             'scheduled_at' => 'nullable|date',
             'media' => 'nullable|file|mimes:jpeg,png,jpg,mp4|max:20480',

@@ -19,4 +19,20 @@ class Post extends Model implements HasMedia
              ->acceptsMimeTypes(['image/jpeg', 'image/png', 'video/mp4'])
              ->singleFile();
     }
+
+
+    public function comments()
+    {
+        return $this->hasMany(PostComment::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(PostLike::class);
+    }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(PostBookmark::class);
+    }
 }

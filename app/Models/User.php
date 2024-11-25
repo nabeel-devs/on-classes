@@ -5,16 +5,19 @@ namespace App\Models;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Jobs\user\SendVerificationCodeJob;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Notifications\Notifiable;
+use App\Jobs\user\SendVerificationCodeJob;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, Billable;
+    use HasApiTokens, HasFactory, Notifiable, Billable, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +30,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'username',
         'dob',
+        'gender',
+        'phone',
+        'role',
         'verification_code',
         'verification_code_expires_at',
         'provider',
@@ -56,6 +62,18 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(150)
+            ->height(150)
+            ->sharpen(10);
+
+        $this->addMediaConversion('preview')
+            ->width(300)
+            ->height(300);
+    }
+
 
     public function sendEmailVerificationNotification()
     {
@@ -71,4 +89,32 @@ class User extends Authenticatable implements MustVerifyEmail
         return $verificationCode;
 
     }
+
+    public function getDpUrl($conversion = 'preview'): string
+    {
+        return $this->getFirstMediaUrl('dp', $conversion) ?: asset('assets/img/default-dp.png');
+    }
+
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
+
+    public function followers()
+    {
+        return $this->hasMany(Follow::class, 'following_id');
+    }
+
+    public function followings()
+    {
+        return $this->hasMany(Follow::class, 'follower_id');
+    }
+
+    public function links()
+    {
+        return $this->hasMany(UserLink::class);
+    }
+
+
 }

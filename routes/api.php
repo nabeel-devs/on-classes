@@ -2,8 +2,16 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\user\ChatController;
 use App\Http\Controllers\api\user\PostController;
+use App\Http\Controllers\api\user\FollowController;
 use App\Http\Controllers\api\user\ContactController;
+use App\Http\Controllers\api\user\MessageController;
+use App\Http\Controllers\api\user\ProfileController;
+use App\Http\Controllers\api\user\PostLikeController;
+use App\Http\Controllers\api\user\UserLinkController;
+use App\Http\Controllers\api\user\PostCommentController;
+use App\Http\Controllers\api\user\PostBookmarkController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -45,15 +53,79 @@ Route::group(['prefix' => 'user'], function () {
 
 
 
+            Route::prefix('profile')->group(function () {
 
+                Route::get('/', [ProfileController::class, 'show']);
 
-            Route::prefix('posts')->middleware('auth')->controller(PostController::class)->group(function () {
-                Route::get('/', 'index')->name('posts.index');
-                Route::post('/', 'store')->name('posts.store');
-                Route::get('/{post}', 'show')->name('posts.show');
-                Route::put('/{post}', 'update')->name('posts.update');
-                Route::delete('/{post}', 'destroy')->name('posts.destroy');
+                Route::post('/dp', [ProfileController::class, 'uploadDp']);
+                Route::get('/dp', [ProfileController::class, 'getDp']);
+                Route::put('/update', [ProfileController::class, 'update']);
+
             });
+
+            Route::prefix('links')->group(function () {
+
+                Route::post('/', [UserLinkController::class, 'store']);
+                Route::get('/', [UserLinkController::class, 'index']);
+                Route::get('/{userLink}', [UserLinkController::class, 'show']);
+                Route::put('/{userLink}', [UserLinkController::class, 'update']);
+                Route::delete('/{userLink}', [UserLinkController::class, 'destroy']);
+
+            });
+
+
+            Route::prefix('posts')->controller(PostController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/{post}', 'show');
+                Route::put('/{post}', 'update');
+                Route::delete('/{post}', 'destroy');
+                Route::get('/{user}/posts', 'userPosts');
+
+            });
+            Route::prefix('posts')->group(function () {
+                Route::post('{post}/comments', [PostCommentController::class, 'store']);
+                Route::delete('comments/{comment}', [PostCommentController::class, 'destroy']);
+
+                // Post Likes
+                Route::post('{post}/likes', [PostLikeController::class, 'store']);
+                Route::delete('likes/{like}', [PostLikeController::class, 'destroy']);
+
+                // Post Bookmarks
+                Route::post('{post}/bookmarks', [PostBookmarkController::class, 'store']);
+                Route::delete('bookmarks/{bookmark}', [PostBookmarkController::class, 'destroy']);
+            });
+
+
+            Route::prefix('chats')->group(function () {
+
+                Route::get('/', [ChatController::class, 'index']);
+                Route::post('/', [ChatController::class, 'store']);
+                Route::get('/{chat}', [ChatController::class, 'show']);
+
+                // Message-related routes
+                Route::post('/{chat}/messages', [MessageController::class, 'store']);
+                Route::get('/{chat}/messages', [MessageController::class, 'index']);
+                Route::patch('/messages/{message}/read', [MessageController::class, 'markAsRead']);
+
+            });
+
+
+            Route::post('/follow/{user}', [FollowController::class, 'follow']);
+            Route::delete('/unfollow/{user}', [FollowController::class, 'unfollow']);
+            Route::get('/followers', [FollowController::class, 'getFollowers']);
+            Route::get('/followings', [FollowController::class, 'getFollowings']);
+            Route::get('/user/{user?}/follow/count', [FollowController::class, 'getFollowCounts']);
+
+
+
+
+
+
+
+
+
+
         });
     });
 });

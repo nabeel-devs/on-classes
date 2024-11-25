@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Http\Controllers\api\user;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\user\UserResource;
+use App\Http\Requests\user\UpdateUserRequest;
+
+class ProfileController extends Controller
+{
+    public function uploadDp(Request $request)
+    {
+        $request->validate([
+            'dp' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = auth()->user();
+
+        // Remove the old DP if exists
+        $user->clearMediaCollection('dp');
+
+        // Add the new DP
+        $user->addMediaFromRequest('dp')->toMediaCollection('dp');
+
+        return response()->json([
+            'message' => 'Display picture updated successfully.',
+            'dp_url' => $user->getDpUrl('thumb'),
+        ]);
+    }
+
+    public function getDp()
+    {
+        $user = auth()->user();
+
+        return response()->json([
+            'dp_url' => $user->getDpUrl(),
+        ]);
+    }
+
+
+    public function update(UpdateUserRequest $request)
+    {
+        $user = auth()->user(); // Get the authenticated user
+
+        // Update the user's information
+        $user->name = $request->input('name');
+        $user->username = $request->input('username');
+        $user->email = $request->input('email');
+        $user->dob = $request->input('dob');
+        $user->gender = $request->input('gender');
+        $user->phone = $request->input('phone');
+
+        // If the user is updating their password
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        // Handle profile picture upload (if provided)
+        if ($request->hasFile('dp')) {
+            $user->addMediaFromRequest('dp')->toMediaCollection('profile_pictures');
+        }
+
+        // Save the updated user data
+        $user->save();
+
+        return response()->json([
+            'message' => 'User information updated successfully.',
+            'user' => new UserResource($user),
+        ]);
+    }
+
+    public function show()
+    {
+        $user = auth()->user();
+
+        return new UserResource($user);
+    }
+
+
+
+
+}

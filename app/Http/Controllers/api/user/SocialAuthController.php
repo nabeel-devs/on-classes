@@ -10,27 +10,27 @@ use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
 {
-    public function redirectToGoogle()
-    {
-        return Socialite::driver('google')->stateless()->redirect();
-    }
+    // public function redirectToGoogle()
+    // {
+    //     return Socialite::driver('google')->stateless()->redirect();
+    // }
 
-    public function handleGoogleCallback()
-    {
-        $user = Socialite::driver('google')->stateless()->user();
-        return $this->findOrCreateUser($user, 'google');
-    }
+    // public function handleGoogleCallback()
+    // {
+    //     $user = Socialite::driver('google')->stateless()->user();
+    //     return $this->findOrCreateUser($user, 'google');
+    // }
 
-    public function redirectToFacebook()
-    {
-        return Socialite::driver('facebook')->stateless()->redirect();
-    }
+    // public function redirectToFacebook()
+    // {
+    //     return Socialite::driver('facebook')->stateless()->redirect();
+    // }
 
-    public function handleFacebookCallback()
-    {
-        $user = Socialite::driver('facebook')->stateless()->user();
-        return $this->findOrCreateUser($user, 'facebook');
-    }
+    // public function handleFacebookCallback()
+    // {
+    //     $user = Socialite::driver('facebook')->stateless()->user();
+    //     return $this->findOrCreateUser($user, 'facebook');
+    // }
 
     private function findOrCreateUser($socialUser, $provider)
     {
@@ -83,10 +83,22 @@ class SocialAuthController extends Controller
 
     public function googleStore(Request $request)
     {
-        $user = User::where('provider_id', $request->provider_id)
-            ->where('provider', $request->provider)
-            ->first();
+        // Validate the incoming request
+        $request->validate([
+            'provider_id' => 'required|string',
+            'provider' => 'required|string',
+            'email' => 'required|email',
+            'name' => 'required|string',
+        ]);
 
+        // Try finding the user by provider details or fallback to email
+        $user = User::where(function ($query) use ($request) {
+            $query->where('provider_id', $request->provider_id)
+                ->where('provider', $request->provider)
+                ->orWhere('email', $request->email);
+        })->first();
+
+        // Create a new user if none is found
         if (!$user) {
             $username = $this->generateUniqueUsername($request->name);
 
@@ -97,13 +109,19 @@ class SocialAuthController extends Controller
                 'username' => $username,
                 'provider' => $request->provider,
                 'provider_id' => $request->provider_id,
+                'email_verified_at' => now(),
             ]);
-
-            $user->email_verified_at = now();
-            $user->save();
+        } else {
+            // Update provider details if missing
+            if (!$user->provider || !$user->provider_id) {
+                $user->update([
+                    'provider' => $request->provider,
+                    'provider_id' => $request->provider_id,
+                ]);
+            }
         }
 
-        // Generate token or log in user
+        // Generate token for the user
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -111,6 +129,7 @@ class SocialAuthController extends Controller
             'token' => $token,
         ]);
     }
+
 
 
 }

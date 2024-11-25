@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\user;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\post\PostResource;
@@ -13,13 +14,22 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('media')->paginate();
+        $posts = Post::with('media', 'likes', 'comments')->paginate(20);
+        return PostResource::collection($posts);
+    }
+
+    public function userPosts(User $user)
+    {
+        $posts = Post::with('media', 'likes', 'comments')
+            ->where('user_id', $user->id)->paginate(20);
         return PostResource::collection($posts);
     }
 
     public function store(StorePostRequest $request)
     {
-        $post = Post::create($request->validated() + ['user_id' => _user()->id]);
+        $post = Post::create(
+            $request->except('media') + ['user_id' => _user()->id]
+        );
 
         if ($request->hasFile('media')) {
             $post->addMedia($request->file('media'))->toMediaCollection('posts');
@@ -30,12 +40,12 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        return new PostResource($post->load('media'));
+        return new PostResource($post->load('media', 'likes', 'comments'));
     }
 
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $post->update($request->validated());
+        $post->update($request->except('media'));
 
         if ($request->hasFile('media')) {
             $post->clearMediaCollection('posts');
@@ -48,6 +58,10 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        return response()->noContent();
+        return response()->json([
+            'success' => true,
+            'message' => 'Post deleted successfully.',
+        ], 200);
     }
+
 }

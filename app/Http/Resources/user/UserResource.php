@@ -20,7 +20,15 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'email' => $this->email,
             'dob' => $this->dob,
+            'gender' => $this->gender,
+            'phone' => $this->phone,
+            'role' => $this->role,
+            'provider' => $this->provider,
+            'provider_id' => $this->provider_id,
+            'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'dp_url' => $this->getDpUrl(), // Display Picture URL
         ];
     }
 }

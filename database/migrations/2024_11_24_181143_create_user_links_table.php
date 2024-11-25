@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('user_links', function (Blueprint $table) {
             $table->id();
-            $table->text('content');
-            $table->enum('type', ['text', 'image', 'video', 'product', 'course', 'reel'])->default('text');
-            $table->enum('who_can_reply', ['everyone', 'verified_accounts', 'only_community'])->default('everyone');
-            $table->timestamp('scheduled_at')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('name');
+            $table->string('url');
             $table->timestamps();
         });
-
     }
 
     /**
@@ -29,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('user_links');
     }
 };
