@@ -17,7 +17,7 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $validated = $request->validated();
-        $validated['password'] = Hash::make($validated['password']);
+        // $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
 
@@ -57,5 +57,33 @@ class AuthController extends Controller
             'Login successful'
         );
     }
+
+    public function createPassword(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Find the user by email
+        $user = auth()->user();
+
+        // Check if the user is verified
+        if (!$user->hasVerifiedEmail()) {
+            return jsonResponse(false, null, 'User email is not verified.', 403);
+        }
+
+        // Update the user's password
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return jsonResponse(
+            true,
+            null,
+            'Password created successfully.'
+        );
+    }
+
 
 }

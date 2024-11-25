@@ -45,11 +45,16 @@ Route::group(['prefix' => 'user'], function () {
         Route::post('/email/verify', [App\Http\Controllers\api\user\EmailVerificationController::class, 'verify']);
         Route::post('/email/resend', [App\Http\Controllers\api\user\EmailVerificationController::class, 'resend']);
 
+
         Route::middleware(['verified'])->group(function () {
+            Route::post('/create-password', [App\Http\Controllers\api\user\AuthController::class, 'createPassword']);
+
+
             Route::post('/subscribe', [App\Http\Controllers\api\user\SubscriptionController::class, 'subscribe']);
             Route::post('/subscription/payment-method', [App\Http\Controllers\api\user\SubscriptionController::class, 'updatePaymentMethod']);
             Route::get('/subscription/status', [App\Http\Controllers\api\user\SubscriptionController::class, 'status']);
             Route::get('/subscription/plans', [App\Http\Controllers\api\user\SubscriptionController::class, 'getPlans']);
+
 
 
 
