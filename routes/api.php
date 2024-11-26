@@ -6,6 +6,7 @@ use App\Http\Controllers\api\user\ChatController;
 use App\Http\Controllers\api\user\PostController;
 use App\Http\Controllers\api\user\FollowController;
 use App\Http\Controllers\api\user\ContactController;
+use App\Http\Controllers\api\user\DiplomaController;
 use App\Http\Controllers\api\user\MessageController;
 use App\Http\Controllers\api\user\ProfileController;
 use App\Http\Controllers\api\user\PostLikeController;
@@ -65,6 +66,16 @@ Route::group(['prefix' => 'user'], function () {
                 Route::post('/dp', [ProfileController::class, 'uploadDp']);
                 Route::get('/dp', [ProfileController::class, 'getDp']);
                 Route::put('/update', [ProfileController::class, 'update']);
+
+            });
+
+            Route::prefix('diplomas')->group(function () {
+
+                Route::get('/', [DiplomaController::class, 'index']);
+
+                Route::post('/upload', [DiplomaController::class, 'uploadDiplomaData']);
+
+                Route::get('/{diploma}', [DiplomaController::class, 'previewDiploma']);
 
             });
 

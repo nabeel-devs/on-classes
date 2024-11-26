@@ -103,7 +103,8 @@ class SocialAuthController extends Controller
             $username = $this->generateUniqueUsername($request->name);
 
             $user = User::create([
-                'name' => $request->name,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
                 'email' => $request->email,
                 'password' => bcrypt(Str::random(8)),
                 'username' => $username,
