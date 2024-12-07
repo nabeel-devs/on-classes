@@ -19,9 +19,7 @@ use App\Http\Controllers\api\user\UserLinkController;
 use App\Http\Controllers\api\user\PostCommentController;
 use App\Http\Controllers\api\user\PostBookmarkController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+
 
 
 Route::group(['prefix' => 'user'], function () {
