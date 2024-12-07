@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\api\CategoryController;
+use App\Http\Controllers\api\creator\CourseController;
+use App\Http\Controllers\api\creator\LessonController;
+use App\Http\Controllers\api\creator\ModuleController;
+use App\Http\Controllers\api\creator\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\user\ChatController;
@@ -66,6 +71,8 @@ Route::group(['prefix' => 'user'], function () {
                 Route::post('/dp', [ProfileController::class, 'uploadDp']);
                 Route::get('/dp', [ProfileController::class, 'getDp']);
                 Route::put('/update', [ProfileController::class, 'update']);
+                Route::put('/update/role', [ProfileController::class, 'updateRole']);
+
 
             });
 
@@ -133,9 +140,56 @@ Route::group(['prefix' => 'user'], function () {
             Route::get('/followings', [FollowController::class, 'getFollowings']);
             Route::get('/user/{user?}/follow/count', [FollowController::class, 'getFollowCounts']);
 
+            Route::prefix('categories')->controller(CategoryController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/{category}', 'show');
+                Route::put('/{category}', 'update');
+                Route::delete('/{category}', 'destroy');
+
+            });
 
 
+            Route::middleware(['creator'])->group(function () {
 
+                Route::prefix('courses')->controller(CourseController::class)->group(function () {
+                    Route::get('/', 'index');
+                    Route::post('/', 'store');
+                    Route::get('/{course}', 'show');
+                    Route::put('/{course}', 'update');
+                    Route::delete('/{course}', 'destroy');
+
+                });
+
+                Route::prefix('modules')->controller(ModuleController::class)->group(function () {
+                    Route::get('/', 'index');
+                    Route::post('/', 'store');
+                    Route::get('/{module}', 'show');
+                    Route::put('/{module}', 'update');
+                    Route::delete('/{module}', 'destroy');
+
+                });
+
+                Route::prefix('lessons')->controller(LessonController::class)->group(function () {
+                    Route::get('/', 'index');
+                    Route::post('/', 'store');
+                    Route::get('/{lesson}', 'show');
+                    Route::put('/{lesson}', 'update');
+                    Route::delete('/{lesson}', 'destroy');
+
+                });
+
+
+                Route::prefix('products')->controller(ProductController::class)->group(function () {
+                    Route::get('/', 'index');
+                    Route::post('/', 'store');
+                    Route::get('/{product}', 'show');
+                    Route::put('/{product}', 'update');
+                    Route::delete('/{product}', 'destroy');
+
+                });
+
+            });
 
 
 

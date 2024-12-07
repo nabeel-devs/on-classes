@@ -78,6 +78,27 @@ class ProfileController extends Controller
         return new UserResource($user);
     }
 
+    public function updateRole(Request $request)
+    {
+
+        $request->validate([
+            'role' => 'required|in:member,creator',
+        ]);
+        $user = auth()->user(); // Get the authenticated user
+
+
+        $user->role = $request->input('role');
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'User role updated successfully.',
+            'user' => new UserResource($user),
+        ]);
+    }
+
+
+
 
 
 
