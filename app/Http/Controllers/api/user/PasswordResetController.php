@@ -26,7 +26,7 @@ class PasswordResetController extends Controller
         }
 
        // Generate a 4-digit reset code
-       $resetCode = rand(1000, 9999);
+       $resetCode = rand(100000, 999999);
 
        // Save the reset code in the password_reset_tokens table
        DB::table('password_reset_tokens')->updateOrInsert(
