@@ -44,7 +44,7 @@ Route::group(['prefix' => 'user'], function () {
         Route::get('/{contact}', 'show')->name('contacts.show');
     });
 
-    Route::middleware(['auth:user'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
 
         Route::post('/email/verify', [App\Http\Controllers\api\user\EmailVerificationController::class, 'verify']);
         Route::post('/email/resend', [App\Http\Controllers\api\user\EmailVerificationController::class, 'resend']);
