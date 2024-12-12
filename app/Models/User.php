@@ -96,6 +96,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
 
     }
 
+    public function fullName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
     public function getDpUrl($conversion = 'preview'): string
     {
         return $this->getFirstMediaUrl('dp', $conversion) ?: asset('assets/img/default-dp.png');
@@ -120,6 +125,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
     public function links()
     {
         return $this->hasMany(UserLink::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
     }
 
 

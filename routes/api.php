@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\creator\CourseController;
+use App\Http\Controllers\api\creator\InsightController;
 use App\Http\Controllers\api\creator\LessonController;
 use App\Http\Controllers\api\creator\ModuleController;
 use App\Http\Controllers\api\creator\ProductController;
+use App\Http\Controllers\api\creator\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\user\ChatController;
@@ -18,9 +20,7 @@ use App\Http\Controllers\api\user\PostLikeController;
 use App\Http\Controllers\api\user\UserLinkController;
 use App\Http\Controllers\api\user\PostCommentController;
 use App\Http\Controllers\api\user\PostBookmarkController;
-
-
-
+use App\Http\Controllers\api\user\ProductOrderController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -147,6 +147,13 @@ Route::group(['prefix' => 'user'], function () {
 
             });
 
+            Route::prefix('products-orders')->controller(ProductOrderController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/{product}', 'show');
+
+            });
+
 
             Route::middleware(['creator'])->group(function () {
 
@@ -186,6 +193,20 @@ Route::group(['prefix' => 'user'], function () {
                     Route::delete('/{product}', 'destroy');
 
                 });
+
+                Route::prefix('insights')->controller(InsightController::class)->group(function () {
+                    Route::get('/', 'index');
+
+                });
+
+                Route::prefix('wallet')->controller(WalletController::class)->group(function () {
+                    Route::post('/transfer/visa', 'transferToVisa');
+                    Route::get('/', 'index');
+
+                });
+
+                // Route::post('/wallet/transfer/visa', [WalletController::class, 'transferToVisa']);
+                // Route::post('/wallet/transfer/paypal', [WalletController::class, 'transferToPayPal']);
 
             });
 
