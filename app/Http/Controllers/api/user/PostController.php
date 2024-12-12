@@ -20,7 +20,7 @@ class PostController extends Controller
 
     public function userPosts(User $user)
     {
-        $posts = Post::with('media', 'likes', 'comments')
+        $posts = Post::with('media', 'likes', 'comments', 'user')
             ->where('user_id', $user->id)->paginate(20);
         return PostResource::collection($posts);
     }
