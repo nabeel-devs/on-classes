@@ -5,6 +5,7 @@ namespace App\Http\Resources\post;
 use Illuminate\Http\Request;
 use App\Http\Resources\user\UserResource;
 use App\Http\Resources\user\CommentResource;
+use Egulias\EmailValidator\Parser\Comment;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostResource extends JsonResource
@@ -27,9 +28,12 @@ class PostResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'liked_by_auth_user' => $this->liked_by_auth_user ?? false, // Whether the authenticated user liked the post
+            'bookmarked_by_auth_user' => $this->bookmarked_by_auth_user ?? false, // Whether the authenticated user bookmarked the post
             'user' => new UserResource($this->whenLoaded('user')),
             'likes' => $this->likes->count(),
-            'comments' => CommentResource::collection($this->comments),
+            'comments' => new CommentResource($this->whenLoaded('comments')),
+
         ];
     }
 }

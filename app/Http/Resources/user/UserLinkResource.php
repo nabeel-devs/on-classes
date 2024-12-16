@@ -3,26 +3,24 @@
 namespace App\Http\Resources\user;
 
 use Illuminate\Http\Request;
-use App\Http\Resources\user\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CommentResource extends JsonResource
+class UserLinkResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         return [
             'id' => $this->id,
-            'comment' => $this->comment,
             'user_id' => $this->user_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'user' => new UserResource($this->whenLoaded('user')),
-
+            'name' => $this->name,
+            'url' => $this->url,
+            'created_at' => $this->created_at->toISOString(),
+            'updated_at' => $this->updated_at->toISOString(),
         ];
     }
 }

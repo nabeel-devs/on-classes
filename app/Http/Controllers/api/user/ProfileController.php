@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\user\UserResource;
 use App\Http\Requests\user\UpdateUserRequest;
+use App\Http\Resources\user\UserProfileResource;
 
 class ProfileController extends Controller
 {
@@ -72,11 +73,15 @@ class ProfileController extends Controller
     }
 
     public function show()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        return new UserResource($user);
-    }
+    // Load the relationships
+    $user->load('links', 'posts.media'); // Load both links and posts (which may include images and videos)
+
+    return new UserProfileResource($user);
+}
+
 
     public function updateRole(Request $request)
     {

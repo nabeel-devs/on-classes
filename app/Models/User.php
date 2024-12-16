@@ -37,7 +37,9 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         'verification_code',
         'verification_code_expires_at',
         'provider',
-        'provider_id'
+        'provider_id',
+        'bio',
+        'profession',
     ];
 
     /**
@@ -131,6 +133,18 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
     {
         return $this->hasMany(Post::class);
     }
+
+    // In User.php model
+public function likes()
+{
+    return $this->belongsToMany(Post::class, 'post_likes')->withTimestamps();
+}
+
+public function bookmarks()
+{
+    return $this->belongsToMany(Post::class, 'post_bookmarks')->withTimestamps();
+}
+
 
 
 }
