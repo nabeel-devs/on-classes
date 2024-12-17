@@ -14,31 +14,40 @@ use App\Http\Requests\user\UpdatePostRequest;
 class PostController extends Controller
 {
     public function index()
-{
-    $posts = Post::with('media', 'likes', 'comments.user', 'user')->paginate(20);
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')->paginate(20);
 
-    if (auth()->check()) {
-        // Get the IDs of posts liked and bookmarked by the authenticated user
-        $likedPostIds = DB::table('post_likes')
-                            ->where('user_id', auth()->id())
-                            ->pluck('post_id')
-                            ->toArray();
+        if (auth()->check()) {
+            $authUserId = auth()->id();
 
-        $bookmarkedPostIds = DB::table('post_bookmarks')
-                                ->where('user_id', auth()->id())
-                                ->pluck('post_id')
-                                ->toArray();
+            // Get liked and bookmarked post IDs
+            $likedPostIds = DB::table('post_likes')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
 
-        // Add 'liked_by_auth_user' and 'bookmarked_by_auth_user' to each post
-        $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
-            $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
-            $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
-            return $post;
-        });
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Transform each post in the collection
+            $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                if (!($post instanceof \App\Models\Post)) {
+                    throw new \Exception('Expected Post instance but got ' . get_class($post));
+                }
+
+                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                return $post;
+            });
+        }
+
+        // Return paginated posts wrapped in PostResource
+        return PostResource::collection($posts);
     }
 
-    return PostResource::collection($posts);
-}
 
 
     public function userPosts(User $user)
@@ -47,25 +56,32 @@ class PostController extends Controller
             ->where('user_id', $user->id)
             ->paginate(20);
 
-        if (auth()->check()) {
-            // Get the IDs of posts liked and bookmarked by the authenticated user
-            $likedPostIds = DB::table('post_likes')
-                                ->where('user_id', auth()->id())
-                                ->pluck('post_id')
-                                ->toArray();
+            if (auth()->check()) {
+                $authUserId = auth()->id();
 
-            $bookmarkedPostIds = DB::table('post_bookmarks')
-                                    ->where('user_id', auth()->id())
-                                    ->pluck('post_id')
-                                    ->toArray();
+                // Get liked and bookmarked post IDs
+                $likedPostIds = DB::table('post_likes')
+                    ->where('user_id', $authUserId)
+                    ->pluck('post_id')
+                    ->toArray();
 
-            // Add 'liked_by_auth_user' and 'bookmarked_by_auth_user' to each post
-            $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
-                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
-                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
-                return $post;
-            });
-        }
+                $bookmarkedPostIds = DB::table('post_bookmarks')
+                    ->where('user_id', $authUserId)
+                    ->pluck('post_id')
+                    ->toArray();
+
+                // Transform each post in the collection
+                $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                    if (!($post instanceof \App\Models\Post)) {
+                        throw new \Exception('Expected Post instance but got ' . get_class($post));
+                    }
+
+                    $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                    $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                    return $post;
+                });
+            }
 
         return PostResource::collection($posts);
     }

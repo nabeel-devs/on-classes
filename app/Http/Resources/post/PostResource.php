@@ -28,12 +28,12 @@ class PostResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'liked_by_auth_user' => $this->liked_by_auth_user ?? false, // Whether the authenticated user liked the post
-            'bookmarked_by_auth_user' => $this->bookmarked_by_auth_user ?? false, // Whether the authenticated user bookmarked the post
+            'liked_by_auth_user' => $this->liked_by_auth_user ?? false,
+            'bookmarked_by_auth_user' => $this->bookmarked_by_auth_user ?? false,
             'user' => new UserResource($this->whenLoaded('user')),
             'likes' => $this->likes->count(),
-            'comments' => new CommentResource($this->whenLoaded('comments')),
-
+            'comments' => CommentResource::collection($this->whenLoaded('comments')),
         ];
     }
+
 }
