@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Jobs\NewPostNotificationJob;
+use Illuminate\Support\Facades\File;
 use App\Http\Resources\post\PostResource;
 use App\Http\Requests\user\StorePostRequest;
 use App\Http\Requests\user\UpdatePostRequest;
@@ -15,7 +17,10 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')->paginate(20);
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        ->where('is_story', false)
+        ->where('type', '!=', 'reel')
+        ->paginate(20);
 
         if (auth()->check()) {
             $authUserId = auth()->id();
@@ -54,6 +59,8 @@ class PostController extends Controller
     {
         $posts = Post::with('media', 'likes', 'comments.user', 'user')
             ->where('user_id', $user->id)
+            ->where('is_story', false)
+            ->where('type', '!=', 'reel')
             ->paginate(20);
 
             if (auth()->check()) {
@@ -99,7 +106,72 @@ class PostController extends Controller
             $post->addMedia($request->file('media'))->toMediaCollection('posts');
         }
 
+        dispatch(new NewPostNotificationJob($post));
+
         return new PostResource($post);
+    }
+
+    public function store2(StorePostRequest $request)
+    {
+        $post = Post::create(
+            $request->except(['media', 'chunk', 'chunkIndex', 'totalChunks']) + ['user_id' => _user()->id]
+        );
+
+        if ($request->hasFile('media')) {
+            $file = $request->file('media');
+            $chunkIndex = $request->input('chunkIndex');
+            $totalChunks = $request->input('totalChunks');
+
+            // Define temp storage path
+            $tempPath = storage_path('app/uploads/' . $post->id);
+            $chunkPath = $tempPath . '/' . $chunkIndex;
+
+            // Create directory if not exists
+            if (!file_exists($tempPath)) {
+                mkdir($tempPath, 0755, true);
+            }
+
+            // Move chunk to temp path
+            $file->move($tempPath, $chunkIndex);
+
+            // Check if all chunks are uploaded
+            if ($this->allChunksUploaded($tempPath, $totalChunks)) {
+                $finalPath = $tempPath . '/final.mp4';
+
+                // Merge chunks
+                $this->mergeChunks($tempPath, $finalPath);
+
+                // Add to media collection
+                $post->addMedia($finalPath)->toMediaCollection('posts');
+
+                // Cleanup temporary files
+                File::deleteDirectory($tempPath);
+            }
+        }
+
+        return new PostResource($post);
+    }
+
+    // Helper to check if all chunks are uploaded
+    private function allChunksUploaded($tempPath, $totalChunks)
+    {
+        $files = File::files($tempPath);
+        return count($files) == $totalChunks;
+    }
+
+    // Helper to merge chunks
+    private function mergeChunks($tempPath, $finalPath)
+    {
+        $chunks = File::files($tempPath);
+        sort($chunks);
+
+        $final = fopen($finalPath, 'ab');
+
+        foreach ($chunks as $chunk) {
+            fwrite($final, file_get_contents($chunk->getRealPath()));
+        }
+
+        fclose($final);
     }
 
     public function show(Post $post)
@@ -150,5 +222,213 @@ class PostController extends Controller
             'message' => 'Post deleted successfully.',
         ], 200);
     }
+
+
+
+
+    public function getReels()
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        ->where('type', 'reel')
+        ->where('is_story', false)
+        ->paginate(20);
+
+        if (auth()->check()) {
+            $authUserId = auth()->id();
+
+            // Get liked and bookmarked post IDs
+            $likedPostIds = DB::table('post_likes')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Transform each post in the collection
+            $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                if (!($post instanceof \App\Models\Post)) {
+                    throw new \Exception('Expected Post instance but got ' . get_class($post));
+                }
+
+                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                return $post;
+            });
+        }
+
+        // Return paginated posts wrapped in PostResource
+        return PostResource::collection($posts);
+    }
+
+
+    public function userReels(User $user)
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+            ->where('user_id', $user->id)
+            ->where('type', 'reel')
+            ->where('is_story', false)
+            ->paginate(20);
+
+            if (auth()->check()) {
+                $authUserId = auth()->id();
+
+                // Get liked and bookmarked post IDs
+                $likedPostIds = DB::table('post_likes')
+                    ->where('user_id', $authUserId)
+                    ->pluck('post_id')
+                    ->toArray();
+
+                $bookmarkedPostIds = DB::table('post_bookmarks')
+                    ->where('user_id', $authUserId)
+                    ->pluck('post_id')
+                    ->toArray();
+
+                // Transform each post in the collection
+                $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                    if (!($post instanceof \App\Models\Post)) {
+                        throw new \Exception('Expected Post instance but got ' . get_class($post));
+                    }
+
+                    $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                    $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                    return $post;
+                });
+            }
+
+        return PostResource::collection($posts);
+    }
+
+
+
+    public function getStories()
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        ->where('is_story', true)
+        ->where('type', '!=', 'reel')
+        ->paginate(20);
+
+        if (auth()->check()) {
+            $authUserId = auth()->id();
+
+            // Get liked and bookmarked post IDs
+            $likedPostIds = DB::table('post_likes')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Transform each post in the collection
+            $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                if (!($post instanceof \App\Models\Post)) {
+                    throw new \Exception('Expected Post instance but got ' . get_class($post));
+                }
+
+                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                return $post;
+            });
+        }
+
+        // Return paginated posts wrapped in PostResource
+        return PostResource::collection($posts);
+    }
+
+
+    public function userStories(User $user)
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+            ->where('user_id', $user->id)
+            ->where('is_story', true)
+            ->where('type', '!=', 'reel')
+            ->paginate(20);
+
+            if (auth()->check()) {
+                $authUserId = auth()->id();
+
+                // Get liked and bookmarked post IDs
+                $likedPostIds = DB::table('post_likes')
+                    ->where('user_id', $authUserId)
+                    ->pluck('post_id')
+                    ->toArray();
+
+                $bookmarkedPostIds = DB::table('post_bookmarks')
+                    ->where('user_id', $authUserId)
+                    ->pluck('post_id')
+                    ->toArray();
+
+                // Transform each post in the collection
+                $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                    if (!($post instanceof \App\Models\Post)) {
+                        throw new \Exception('Expected Post instance but got ' . get_class($post));
+                    }
+
+                    $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                    $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                    return $post;
+                });
+            }
+
+        return PostResource::collection($posts);
+    }
+
+
+    public function getFollowingPosts()
+    {
+        $authUserId = auth()->id();
+
+        // Get the IDs of users the auth user follows
+        $followingIds = DB::table('follows')
+            ->where('follower_id', $authUserId)
+            ->pluck('following_id');
+
+        // Fetch posts from followed users
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+            ->whereIn('user_id', $followingIds)
+            ->where('is_story', false)
+            ->where('type', '!=', 'reel')
+            ->paginate(20);
+
+        if (auth()->check()) {
+            // Get liked and bookmarked post IDs
+            $likedPostIds = DB::table('post_likes')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Transform each post in the collection
+            $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                if (!($post instanceof \App\Models\Post)) {
+                    throw new \Exception('Expected Post instance but got ' . get_class($post));
+                }
+
+                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                return $post;
+            });
+        }
+
+        return PostResource::collection($posts);
+    }
+
+
+
+
 
 }

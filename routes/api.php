@@ -15,6 +15,7 @@ use App\Http\Controllers\api\user\FollowController;
 use App\Http\Controllers\api\user\ContactController;
 use App\Http\Controllers\api\user\DiplomaController;
 use App\Http\Controllers\api\user\MessageController;
+use App\Http\Controllers\api\user\NotificationController;
 use App\Http\Controllers\api\user\ProfileController;
 use App\Http\Controllers\api\user\PostLikeController;
 use App\Http\Controllers\api\user\UserLinkController;
@@ -94,14 +95,31 @@ Route::group(['prefix' => 'user'], function () {
 
             });
 
+            Route::prefix('notifications')->group(function () {
+
+                Route::get('/', [NotificationController::class, 'getNotifications']);
+
+                Route::post('/{notificationId}/read', [NotificationController::class, 'markAsRead']);
+
+                Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+
+                Route::get('/unread', [NotificationController::class, 'getUnreadNotifications']);
+
+            });
+
 
             Route::prefix('posts')->controller(PostController::class)->group(function () {
                 Route::get('/', 'index');
+                Route::get('/reels', 'getReels');
+                Route::get('/stories', 'getStories');
+                Route::get('/following-posts', 'getFollowingPosts');
                 Route::post('/', 'store');
                 Route::get('/{post}', 'show');
                 Route::put('/{post}', 'update');
                 Route::delete('/{post}', 'destroy');
                 Route::get('/{user}/posts', 'userPosts');
+                Route::get('/{user}/reels', 'userReels');
+                Route::get('/{user}/stories', 'userStories');
 
             });
             Route::prefix('posts')->group(function () {

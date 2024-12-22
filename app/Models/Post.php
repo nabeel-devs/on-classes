@@ -13,6 +13,10 @@ class Post extends Model implements HasMedia
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_story' => 'bool'
+    ];
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('posts')

@@ -17,7 +17,11 @@ class CategoryController extends Controller
 
     public function store(CategoryStoreRequest $request)
     {
-        $category = Category::create($request->validated());
+        $category = Category::create($request->except('icon'));
+
+        if ($request->hasFile('icon')) {
+            $category->addMedia($request->file('icon'))->toMediaCollection('icons');
+        }
         return new CategoryResource($category);
     }
 
@@ -28,7 +32,13 @@ class CategoryController extends Controller
 
     public function update(CategoryStoreRequest $request, Category $category)
     {
-        $category->update($request->validated());
+        $category->update($request->except('icon'));
+
+        if ($request->hasFile('icon')) {
+            $category->clearMediaCollection('icons');
+            $category->addMedia($request->file('icon'))->toMediaCollection('icons');
+        }
+
         return new CategoryResource($category);
     }
 

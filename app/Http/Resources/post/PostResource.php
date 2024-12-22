@@ -26,6 +26,7 @@ class PostResource extends JsonResource
             'media_url' => $this->getFirstMediaUrl('posts'),
             'user_id' => $this->user_id,
             'status' => $this->status,
+            'is_story' => $this->is_story,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'liked_by_auth_user' => $this->liked_by_auth_user ?? false,
