@@ -54,6 +54,20 @@ class PostController extends Controller
     }
 
 
+    public function allPosts()
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        ->where('is_story', false)
+        ->where('type', '!=', 'reel')
+        ->paginate(20);
+
+
+
+        // Return paginated posts wrapped in PostResource
+        return PostResource::collection($posts);
+    }
+
+
 
     public function userPosts(User $user)
     {
