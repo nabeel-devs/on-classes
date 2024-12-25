@@ -12,7 +12,6 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
-        "ext-gd": "*",
         "spatie/laravel-medialibrary": "^11.10"
     },
     "require-dev": {
