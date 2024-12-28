@@ -22,24 +22,26 @@ class PostBookmarkController extends Controller
         if ($bookmark) {
             $bookmark->is_bookmarked = $request->is_bookmarked;
             $bookmark->save();
-
-            return response()->json([
-                'message' => 'Post bookmark status updated successfully.',
-                'data' => $bookmark,
-            ], 200);
         } else {
             $bookmark = PostBookmark::create([
                 'post_id' => $post->id,
                 'user_id' => _user()->id,
                 'is_bookmarked' => $request->is_bookmarked,
             ]);
-
-            return response()->json([
-                'message' => 'Post bookmarked successfully.',
-                'data' => $bookmark,
-            ], 201);
         }
+
+        // Count total bookmarks for the post
+        $bookmarkCount = PostBookmark::where('post_id', $post->id)
+                                    ->where('is_bookmarked', true)
+                                    ->count();
+
+        return response()->json([
+            'message' => 'Post bookmark status updated successfully.',
+            'data' => $bookmark,
+            'bookmark_count' => $bookmarkCount,
+        ], 200);
     }
+
 
     // Remove a bookmark from a post
     public function destroy(PostBookmark $bookmark)

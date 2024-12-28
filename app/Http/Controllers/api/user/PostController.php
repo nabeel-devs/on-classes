@@ -27,11 +27,13 @@ class PostController extends Controller
 
             // Get liked and bookmarked post IDs
             $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
 
             $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
@@ -80,13 +82,14 @@ class PostController extends Controller
             if (auth()->check()) {
                 $authUserId = auth()->id();
 
-                // Get liked and bookmarked post IDs
                 $likedPostIds = DB::table('post_likes')
+                    ->where('is_liked', true)
                     ->where('user_id', $authUserId)
                     ->pluck('post_id')
                     ->toArray();
 
                 $bookmarkedPostIds = DB::table('post_bookmarks')
+                    ->where('is_bookmarked', true)
                     ->where('user_id', $authUserId)
                     ->pluck('post_id')
                     ->toArray();
@@ -252,11 +255,13 @@ class PostController extends Controller
 
             // Get liked and bookmarked post IDs
             $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
 
             $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
@@ -292,11 +297,13 @@ class PostController extends Controller
 
                 // Get liked and bookmarked post IDs
                 $likedPostIds = DB::table('post_likes')
+                    ->where('is_liked', true)
                     ->where('user_id', $authUserId)
                     ->pluck('post_id')
                     ->toArray();
 
                 $bookmarkedPostIds = DB::table('post_bookmarks')
+                    ->where('is_bookmarked', true)
                     ->where('user_id', $authUserId)
                     ->pluck('post_id')
                     ->toArray();
@@ -331,11 +338,13 @@ class PostController extends Controller
 
             // Get liked and bookmarked post IDs
             $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
 
             $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
@@ -371,11 +380,13 @@ class PostController extends Controller
 
                 // Get liked and bookmarked post IDs
                 $likedPostIds = DB::table('post_likes')
+                    ->where('is_liked', true)
                     ->where('user_id', $authUserId)
                     ->pluck('post_id')
                     ->toArray();
 
                 $bookmarkedPostIds = DB::table('post_bookmarks')
+                    ->where('is_bookmarked', true)
                     ->where('user_id', $authUserId)
                     ->pluck('post_id')
                     ->toArray();
@@ -416,11 +427,13 @@ class PostController extends Controller
         if (auth()->check()) {
             // Get liked and bookmarked post IDs
             $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();
 
             $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
                 ->where('user_id', $authUserId)
                 ->pluck('post_id')
                 ->toArray();

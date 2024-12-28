@@ -23,24 +23,26 @@ class PostLikeController extends Controller
             // If a like already exists, update the is_liked status
             $like->is_liked = $request->is_liked;
             $like->save();
-
-            return response()->json([
-                'message' => 'Post like status updated successfully.',
-                'data' => $like,
-            ], 200);
         } else {
             $like = PostLike::create([
                 'post_id' => $post->id,
                 'user_id' => _user()->id,
                 'is_liked' => $request->is_liked,
             ]);
-
-            return response()->json([
-                'message' => 'Post liked successfully.',
-                'data' => $like,
-            ], 201);
         }
+
+        // Count total likes for the post
+        $likeCount = PostLike::where('post_id', $post->id)
+                            ->where('is_liked', true)
+                            ->count();
+
+        return response()->json([
+            'message' => 'Post like status updated successfully.',
+            'data' => $like,
+            'like_count' => $likeCount,
+        ], 200);
     }
+
 
 
     // Remove a like from a post
