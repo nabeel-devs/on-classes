@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\user;
 use App\Models\Chat;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\user\UserResource;
 
 class ChatController extends Controller
 {
@@ -16,7 +17,17 @@ class ChatController extends Controller
             ->with(['user1', 'user2', 'messages'])
             ->get();
 
-        return response()->json($chats);
+        return response()->json([
+            'chats' => $chats->map(function ($chat) {
+                return [
+                    'id' => $chat->id,
+                    'user1' => new UserResource($chat->user1),
+                    'user2' => new UserResource($chat->user2),
+                    'messages' => $chat->messages,
+                    'created_at' => $chat->created_at,
+                ];
+            }),
+        ]);
     }
 
     // Create a new chat between two users
