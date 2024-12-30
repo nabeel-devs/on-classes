@@ -83,6 +83,24 @@ class ProfileController extends Controller
 }
 
 
+public function updateOnlineStatus(Request $request)
+{
+    $request->validate([
+        'online' => 'required|boolean',
+    ]);
+
+    $user = _user();  // Get the authenticated user
+    $user->online = $request->online;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Online status updated successfully',
+        'online' => $user->online,
+    ]);
+}
+
+
+
     public function updateRole(Request $request)
     {
 

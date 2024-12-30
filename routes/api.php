@@ -71,6 +71,8 @@ Route::group(['prefix' => 'user'], function () {
                 Route::get('/', [ProfileController::class, 'show']);
 
                 Route::post('/dp', [ProfileController::class, 'uploadDp']);
+                Route::post('/online-status', [ProfileController::class, 'updateOnlineStatus']);
+
                 Route::get('/dp', [ProfileController::class, 'getDp']);
                 Route::put('/update', [ProfileController::class, 'update']);
                 Route::put('/update/role', [ProfileController::class, 'updateRole']);
@@ -142,13 +144,22 @@ Route::group(['prefix' => 'user'], function () {
             Route::prefix('chats')->group(function () {
 
                 Route::get('/', [ChatController::class, 'index']);
+                Route::get('/quick-chat-users', [ChatController::class, 'quickChat']);
+                Route::get('/users-list', [ChatController::class, 'userList']);
+                Route::get('/requests', [ChatController::class, 'requestChats']);
+                Route::get('/archived', [ChatController::class, 'archivedChats']);
                 Route::post('/', [ChatController::class, 'store']);
                 Route::get('/{chat}', [ChatController::class, 'show']);
+                Route::post('/{chat}/accept-request', [ChatController::class, 'acceptRequest']);
+                Route::post('/{chat}/archived', [ChatController::class, 'setArchived']);
+                Route::delete('/{chat}/delete', [ChatController::class, 'destroy']);
 
                 // Message-related routes
                 Route::post('/{chat}/messages', [MessageController::class, 'store']);
                 Route::get('/{chat}/messages', [MessageController::class, 'index']);
                 Route::patch('/messages/{message}/read', [MessageController::class, 'markAsRead']);
+                Route::delete('/{chat}/{message}/delete', [MessageController::class, 'destroyMessage']);
+
 
             });
 

@@ -57,4 +57,30 @@ class MessageController extends Controller
 
         return response()->json(['message' => 'Message marked as read']);
     }
+
+    public function destroyMessage(Chat $chat, Message $message)
+    {
+        $user = _user();
+
+        // Ensure the user is part of the chat
+        if ($chat->user1_id !== $user->id && $chat->user2_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        // Ensure the message belongs to the chat
+        if ($message->chat_id !== $chat->id) {
+            return response()->json(['message' => 'Message not found in this chat'], 404);
+        }
+
+        // Ensure the user is the sender of the message or authorized to delete it
+        if ($message->sender_id !== $user->id) {
+            return response()->json(['message' => 'You can only delete your own messages'], 403);
+        }
+
+        // Delete the message
+        $message->delete();
+
+        return response()->json(['message' => 'Message deleted successfully']);
+    }
+
 }
