@@ -18,9 +18,15 @@ class MessageController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $messages = $chat->messages()->with('sender')->get();
+        // Fetch messages in descending order by created_at
+        $messages = $chat->messages()
+            ->with('sender')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return response()->json($messages);
     }
+
 
     // Send a message in a chat
     public function store(Request $request, Chat $chat)
