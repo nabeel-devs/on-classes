@@ -97,7 +97,7 @@ class ChatController extends Controller
         ]);
     }
 
-    public function acceptRequest($chatId)
+    public function acceptRequest(Request $request, $chatId)
     {
         $user = _user();
         $chat = Chat::where('id', $chatId)
@@ -107,7 +107,7 @@ class ChatController extends Controller
                     })
                     ->firstOrFail();
 
-        $chat->accepted = true;
+        $chat->accepted = $request->accepted;
         $chat->save();
 
         return response()->json(['message' => 'Request accepted', 'chat' => $chat]);
@@ -174,7 +174,6 @@ class ChatController extends Controller
     }
 
 
-    // Show details of a specific chat
     public function show(Chat $chat)
     {
         $user = _user();
@@ -185,11 +184,21 @@ class ChatController extends Controller
         }
 
         // Load the users and messages in descending order by created_at
-        $chat->load(['user1', 'user2', 'messages.sender' => function ($query) {
+        $chat->load(['user1', 'user2', 'messages' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
-        return response()->json($chat);
+        return response()->json([
+            'chats' => [
+                [
+                    'id' => $chat->id,
+                    'user1' => new UserResource($chat->user1),
+                    'user2' => new UserResource($chat->user2),
+                    'messages' => $chat->messages,
+                    'created_at' => $chat->created_at,
+                ]
+            ]
+        ]);
     }
 
 
