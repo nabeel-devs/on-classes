@@ -1,27 +1,30 @@
 <?php
 
-use App\Http\Controllers\api\CategoryController;
-use App\Http\Controllers\api\creator\CourseController;
-use App\Http\Controllers\api\creator\InsightController;
-use App\Http\Controllers\api\creator\LessonController;
-use App\Http\Controllers\api\creator\ModuleController;
-use App\Http\Controllers\api\creator\ProductController;
-use App\Http\Controllers\api\creator\WalletController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\user\ChatController;
 use App\Http\Controllers\api\user\PostController;
 use App\Http\Controllers\api\user\FollowController;
 use App\Http\Controllers\api\user\ContactController;
 use App\Http\Controllers\api\user\DiplomaController;
 use App\Http\Controllers\api\user\MessageController;
-use App\Http\Controllers\api\user\NotificationController;
 use App\Http\Controllers\api\user\ProfileController;
 use App\Http\Controllers\api\user\PostLikeController;
 use App\Http\Controllers\api\user\UserLinkController;
+use App\Http\Controllers\api\creator\CourseController;
+use App\Http\Controllers\api\creator\LessonController;
+use App\Http\Controllers\api\creator\ModuleController;
+use App\Http\Controllers\api\creator\WalletController;
+use App\Http\Controllers\api\creator\InsightController;
+use App\Http\Controllers\api\creator\ProductController;
 use App\Http\Controllers\api\user\PostCommentController;
+use App\Http\Controllers\api\user\ProductFeedController;
+use App\Http\Controllers\api\user\NotificationController;
 use App\Http\Controllers\api\user\PostBookmarkController;
 use App\Http\Controllers\api\user\ProductOrderController;
+use App\Http\Controllers\api\user\ProductReviewController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -179,10 +182,27 @@ Route::group(['prefix' => 'user'], function () {
 
             });
 
+            Route::prefix('products-feed')->controller(ProductFeedController::class)->group(function () {
+                Route::get('/all', 'index');
+                Route::get('/{categoryId}/products', 'categoryProducts');
+
+            });
+
             Route::prefix('products-orders')->controller(ProductOrderController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::post('/', 'store');
+
+                Route::post('/verify-discount-code', 'verifyDiscountCode');
                 Route::get('/{product}', 'show');
+
+            });
+
+            Route::prefix('products-reviews')->controller(ProductReviewController::class)->group(function () {
+                Route::post('/', 'store');
+                Route::get('/{product}', 'index');
+                Route::put('/{review}', 'update');
+                Route::delete('/{review}', 'destroy');
+
 
             });
 

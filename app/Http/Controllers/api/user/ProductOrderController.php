@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreOrderRequest;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class ProductOrderController extends Controller
@@ -53,6 +54,49 @@ class ProductOrderController extends Controller
         }
 
         return response()->json($order->load('items'), 201);
+    }
+
+
+
+
+
+
+    public function verifyDiscountCode(Request $request)
+    {
+        // Validate the incoming request for discount code
+        $validator = Validator::make($request->all(), [
+            'discount_code' => 'required|string|max:50',
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+
+        // Retrieve the product by its ID
+        $product = Product::find($request->product_id);
+
+        // Check if the product has a discount code
+        if ($product->discount_code && $product->discount_code === $request->discount_code) {
+            // Check if the product is discounted and the discount code is still valid
+            if ($product->is_discounted) {
+                return response()->json([
+                    'success' => true,
+                    'discount_percentage' => $product->discount_percentage,
+                    'message' => 'Discount code is valid.',
+                ], 200);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'The discount code is not applicable for this product.',
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid discount code for this product.',
+        ], 400);
     }
 
 

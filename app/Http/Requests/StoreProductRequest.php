@@ -24,6 +24,12 @@ class StoreProductRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
             'status' => 'required|in:active,inactive',
+            'is_discounted' => 'boolean',
+            'discount_code' => 'nullable|string|max:50',
+            'discount_percentage' => 'nullable|integer|min:1|max:100',
+            'cover_image' => 'nullable|image|max:2048',
+            'detail_images.*' => 'nullable|image|max:2048',
+            'source_file' => 'nullable|mimes:mp3,mp4,zip,rar,png,jpg,jpeg|max:20480',
         ];
     }
 
@@ -32,5 +38,17 @@ class StoreProductRequest extends FormRequest
         $this->merge([
             'user_id' => Auth::id(),
         ]);
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->is_discounted) {
+                if (!$this->discount_code || !$this->discount_percentage) {
+                    $validator->errors()->add('discount_code', 'Discount code is required when the product is discounted.');
+                    $validator->errors()->add('discount_percentage', 'Discount percentage is required when the product is discounted.');
+                }
+            }
+        });
     }
 }

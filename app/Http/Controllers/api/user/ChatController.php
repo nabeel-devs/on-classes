@@ -107,11 +107,16 @@ class ChatController extends Controller
                     })
                     ->firstOrFail();
 
+        // Update the 'accepted' status
         $chat->accepted = $request->accepted;
         $chat->save();
 
-        return response()->json(['message' => 'Request accepted', 'chat' => $chat]);
+        // Determine the response message based on the 'accepted' value
+        $message = $chat->accepted ? 'Request accepted' : 'Request rejected';
+
+        return response()->json(['message' => $message, 'chat' => $chat]);
     }
+
 
     public function setArchived(Request $request, $chatId)
     {

@@ -2,10 +2,12 @@
 
 namespace App\Http\Resources\creator;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\user\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\user\ProductReviewResource;
 
 class ProductResource extends JsonResource
 {
@@ -23,6 +25,9 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'description' => $this->description,
             'status' => $this->status,
+            'is_discounted' => $this->is_discounted,
+            'discount_code' => $this->discount_code,
+            'discount_percentage' => $this->discount_percentage,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'cover_image' => $this->whenLoaded('media', function () {
@@ -38,6 +43,7 @@ class ProductResource extends JsonResource
             }),
             'user' => new UserResource($this->whenLoaded('user')),
             'category' => new CategoryResource($this->whenLoaded('category')),
+            'reviews' => ProductReviewResource::collection($this->whenLoaded('reviews')),
         ];
     }
 }

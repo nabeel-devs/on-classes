@@ -32,4 +32,10 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(User::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
 }

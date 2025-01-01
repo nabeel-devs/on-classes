@@ -41,7 +41,6 @@ class ProductController extends Controller
 
         if ($request->hasFile('detail_images')) {
             foreach ($request->file('detail_images') as $image) {
-                Log::info('Uploading detail image: ' . $image->getClientOriginalName());
                 $product->addMedia($image)
                         ->toMediaCollection('detail_images');
             }
