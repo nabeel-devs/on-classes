@@ -21,6 +21,8 @@ class ModuleStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
             'availability_after_weeks' => 'nullable|integer|min:0',
+            'video' => 'nullable|file|mimes:mp4,mkv,webm|max:20480',
+            'thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:5120',
         ];
     }
 }

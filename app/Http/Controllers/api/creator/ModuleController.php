@@ -17,7 +17,21 @@ class ModuleController extends Controller
 
     public function store(ModuleStoreRequest $request)
     {
-        $module = Module::create($request->validated());
+
+        $moduleData = $request->validated();
+
+        $moduleData = collect($moduleData)->except(['video', 'thumbnail'])->toArray();
+
+        $module = Module::create($moduleData);
+
+        if ($request->hasFile('video')) {
+            $module->addMediaFromRequest('video')->toMediaCollection('video');
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $module->addMediaFromRequest('thumbnail')->toMediaCollection('thumbnail');
+        }
+
         return new ModuleResource($module);
     }
 
@@ -29,6 +43,22 @@ class ModuleController extends Controller
     public function update(ModuleStoreRequest $request, Module $module)
     {
         $module->update($request->validated());
+        return new ModuleResource($module);
+
+        $moduleData = $request->validated();
+
+        $moduleData = collect($moduleData)->except(['video', 'thumbnail'])->toArray();
+
+        $module->update($moduleData);
+
+        if ($request->hasFile('video')) {
+            $module->addMediaFromRequest('video')->toMediaCollection('video');
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $module->addMediaFromRequest('thumbnail')->toMediaCollection('thumbnail');
+        }
+
         return new ModuleResource($module);
     }
 

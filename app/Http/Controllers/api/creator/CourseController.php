@@ -12,12 +12,21 @@ class CourseController extends Controller
 {
     public function index()
     {
-        return CourseResource::collection(Course::with(['modules', 'user'])->get());
+        return CourseResource::collection(Course::with(['modules', 'user','category', 'media'])->get());
     }
 
     public function store(CourseStoreRequest $request)
     {
-        $course = Course::create($request->validated());
+        $courseData = $request->validated();
+
+        $courseData = collect($courseData)->except(['thumbnail'])->toArray();
+
+        $course = Course::create($courseData);
+
+        if ($request->hasFile('thumbnail')) {
+            $course->addMediaFromRequest('thumbnail')->toMediaCollection('thumbnail');
+        }
+
         return new CourseResource($course);
     }
 
@@ -28,9 +37,23 @@ class CourseController extends Controller
 
     public function update(CourseStoreRequest $request, Course $course)
     {
-        $course->update($request->validated());
+        $courseData = $request->validated();
+
+        // Exclude thumbnail from direct update
+        $courseData = collect($courseData)->except(['thumbnail'])->toArray();
+
+        // Update course fields
+        $course->update($courseData);
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail')) {
+            $course->clearMediaCollection('thumbnail');  // Remove existing thumbnail
+            $course->addMediaFromRequest('thumbnail')->toMediaCollection('thumbnail');
+        }
+
         return new CourseResource($course);
     }
+
 
     public function destroy(Course $course)
     {

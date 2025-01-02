@@ -19,6 +19,8 @@ class ModuleResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'availability_after_weeks' => $this->availability_after_weeks,
+            'video' => $this->getFirstMediaUrl('video'),
+            'thumbnail' => $this->getFirstMediaUrl('thumbnail'),
             'course' => new CourseResource($this->whenLoaded('course')),
             'lessons' => LessonResource::collection($this->whenLoaded('lessons')),
         ];
