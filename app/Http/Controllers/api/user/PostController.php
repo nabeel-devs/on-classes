@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\File;
 use App\Http\Resources\post\PostResource;
 use App\Http\Requests\user\StorePostRequest;
 use App\Http\Requests\user\UpdatePostRequest;
+use App\Http\Resources\post\UserStoryResource;
 
 class PostController extends Controller
 {
@@ -365,6 +366,52 @@ class PostController extends Controller
         // Return paginated posts wrapped in PostResource
         return PostResource::collection($posts);
     }
+
+    public function getStoriesUpdated()
+    {
+        // Get all users with their stories
+        $usersWithStories = \App\Models\User::with([
+            'posts' => function ($query) {
+                $query->where('is_story', true)
+                    ->where('type', '!=', 'reel')
+                    ->with('media', 'likes', 'comments.user');
+            }
+        ])->whereHas('posts', function ($query) {
+            $query->where('is_story', true)
+                ->where('type', '!=', 'reel');
+        })->paginate(20);
+
+        // If the user is authenticated, check likes and bookmarks
+        if (auth()->check()) {
+            $authUserId = auth()->id();
+
+            $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Iterate through users and their stories
+            $usersWithStories->getCollection()->transform(function ($user) use ($likedPostIds, $bookmarkedPostIds) {
+                $user->posts->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                    $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                    $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+                    return $post;
+                });
+                return $user;
+            });
+        }
+
+        // Return users and their stories
+        return UserStoryResource::collection($usersWithStories);
+    }
+
 
 
     public function userStories(User $user)

@@ -120,6 +120,7 @@ Route::group(['prefix' => 'user'], function () {
                 Route::get('/', 'index');
                 Route::get('/reels', 'getReels');
                 Route::get('/stories', 'getStories');
+                Route::get('/stories/updated', 'getStoriesUpdated');
                 Route::get('/following-posts', 'getFollowingPosts');
                 Route::post('/', 'store');
                 Route::get('/{post}', 'show');
