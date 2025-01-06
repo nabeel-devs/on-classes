@@ -72,6 +72,7 @@ Route::group(['prefix' => 'user'], function () {
             Route::prefix('profile')->group(function () {
 
                 Route::get('/', [ProfileController::class, 'show']);
+                Route::get('/{user}/profile-info', [ProfileController::class, 'showUserProfile']);
 
                 Route::post('/dp', [ProfileController::class, 'uploadDp']);
                 Route::post('/online-status', [ProfileController::class, 'updateOnlineStatus']);

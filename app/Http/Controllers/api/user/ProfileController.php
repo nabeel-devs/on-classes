@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\user;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -46,12 +47,14 @@ class ProfileController extends Controller
         $user = auth()->user(); // Get the authenticated user
 
         // Update the user's information
-        $user->name = $request->input('name');
+        $user->first_name = $request->input('first_name');
+        $user->last_name = $request->input('last_name');
         $user->username = $request->input('username');
         $user->email = $request->input('email');
         $user->dob = $request->input('dob');
         $user->gender = $request->input('gender');
         $user->phone = $request->input('phone');
+        $user->bio = $request->input('bio');
 
         // If the user is updating their password
         if ($request->filled('password')) {
@@ -60,7 +63,7 @@ class ProfileController extends Controller
 
         // Handle profile picture upload (if provided)
         if ($request->hasFile('dp')) {
-            $user->addMediaFromRequest('dp')->toMediaCollection('profile_pictures');
+            $user->addMediaFromRequest('dp')->toMediaCollection('dp');
         }
 
         // Save the updated user data
@@ -73,14 +76,22 @@ class ProfileController extends Controller
     }
 
     public function show()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    // Load the relationships
-    $user->load('links', 'posts.media'); // Load both links and posts (which may include images and videos)
+        // Load the relationships
+        $user->load('links', 'posts.media'); // Load both links and posts (which may include images and videos)
 
-    return new UserProfileResource($user);
-}
+        return new UserProfileResource($user);
+    }
+
+    public function showUserProfile(User $user)
+    {
+
+        $user->load('links', 'posts.media'); // Load both links and posts (which may include images and videos)
+
+        return new UserProfileResource($user);
+    }
 
 
 public function updateOnlineStatus(Request $request)

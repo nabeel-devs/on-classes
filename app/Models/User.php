@@ -70,6 +70,14 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         return Media::class;
     }
 
+    public function registerMediaCollections(): void
+    {
+
+        $this->addMediaCollection('dp')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/jpg'])
+            ->singleFile();
+    }
+
     public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')
