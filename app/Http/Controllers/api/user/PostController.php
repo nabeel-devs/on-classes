@@ -125,7 +125,7 @@ class PostController extends Controller
         ini_set('memory_limit', '256M');
 
         if ($request->hasFile('media')) {
-            $post->addMedia($request->file('media'))->usingDisk('s3')->toMediaCollection('posts');
+            $post->addMedia($request->file('media'))->toMediaCollection('posts');
         }
 
         dispatch(new NewPostNotificationJob($post));
