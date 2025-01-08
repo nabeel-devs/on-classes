@@ -120,6 +120,10 @@ class PostController extends Controller
             $request->except('media') + ['user_id' => _user()->id]
         );
 
+        ini_set('upload_max_filesize', '100M');
+        ini_set('post_max_size', '100M');
+        ini_set('memory_limit', '256M');
+
         if ($request->hasFile('media')) {
             $post->addMedia($request->file('media'))->usingDisk('s3')->toMediaCollection('posts');
         }
