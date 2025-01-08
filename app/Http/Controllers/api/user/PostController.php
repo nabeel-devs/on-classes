@@ -121,7 +121,7 @@ class PostController extends Controller
         );
 
         if ($request->hasFile('media')) {
-            $post->addMedia($request->file('media'))->toMediaCollection('posts');
+            $post->addMedia($request->file('media'))->usingDisk('s3')->toMediaCollection('posts');
         }
 
         dispatch(new NewPostNotificationJob($post));
