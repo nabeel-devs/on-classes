@@ -162,6 +162,16 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         return $this->hasMany(Product::class);
     }
 
+    public function participants()
+    {
+        return $this->hasMany(MeetingParticipant::class);
+    }
+
+    public function meetings()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_participants');
+    }
+
 
 
 }

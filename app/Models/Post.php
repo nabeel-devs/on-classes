@@ -22,6 +22,10 @@ class Post extends Model implements HasMedia
         $this->addMediaCollection('posts')
              ->acceptsMimeTypes(['image/jpeg', 'image/png', 'video/mp4'])
              ->singleFile();
+
+        $this->addMediaCollection('music')
+             ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
+             ->singleFile();
     }
 
 

@@ -18,6 +18,7 @@ use App\Http\Controllers\api\creator\LessonController;
 use App\Http\Controllers\api\creator\ModuleController;
 use App\Http\Controllers\api\creator\WalletController;
 use App\Http\Controllers\api\creator\InsightController;
+use App\Http\Controllers\api\creator\MeetingController;
 use App\Http\Controllers\api\creator\ProductController;
 use App\Http\Controllers\api\user\PostCommentController;
 use App\Http\Controllers\api\user\ProductFeedController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\api\user\NotificationController;
 use App\Http\Controllers\api\user\PostBookmarkController;
 use App\Http\Controllers\api\user\ProductOrderController;
 use App\Http\Controllers\api\user\ProductReviewController;
+use App\Http\Controllers\api\creator\ParticipantController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -265,6 +267,21 @@ Route::group(['prefix' => 'user'], function () {
                     Route::post('/transfer/visa', 'transferToVisa');
                     Route::get('/', 'index');
 
+                });
+
+                Route::prefix('meetings')->group(function () {
+                    Route::post('/', [MeetingController::class, 'store']);  // Create a meeting
+                    Route::get('/', [MeetingController::class, 'index']);  // Get all meetings
+                    Route::get('{meeting}', [MeetingController::class, 'show']);  // Get a specific meeting
+                    Route::put('{meeting}', [MeetingController::class, 'update']);  // Update a meeting
+                    Route::delete('{meeting}', [MeetingController::class, 'destroy']);  // Delete a meeting
+                    Route::get('{user}/user-meetings', [MeetingController::class, 'userMeetings']);
+
+                    Route::prefix('{meeting}/participants')->group(function () {
+                        Route::post('/', [ParticipantController::class, 'store']);  // Add a participant to the meeting
+                        Route::delete('{participant}', [ParticipantController::class, 'destroy']);  // Remove a participant from the meeting
+                        Route::get('/', [ParticipantController::class, 'index']);  // Get all participants for a meeting
+                    });
                 });
 
                 // Route::post('/wallet/transfer/visa', [WalletController::class, 'transferToVisa']);
