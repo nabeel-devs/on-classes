@@ -3,6 +3,7 @@
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Stripe\FinancialConnections\Transaction;
 use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\user\ChatController;
 use App\Http\Controllers\api\user\PostController;
@@ -27,6 +28,8 @@ use App\Http\Controllers\api\user\PostBookmarkController;
 use App\Http\Controllers\api\user\ProductOrderController;
 use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
+use App\Http\Controllers\api\creator\TransactionController;
+use App\Http\Controllers\api\creator\WithdrawRequestController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -203,6 +206,7 @@ Route::group(['prefix' => 'user'], function () {
             Route::prefix('products-orders')->controller(ProductOrderController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::post('/', 'store');
+                Route::get('/user/bought-products', 'userProducts');
 
                 Route::post('/verify-discount-code', 'verifyDiscountCode');
                 Route::get('/{product}', 'show');
@@ -263,10 +267,22 @@ Route::group(['prefix' => 'user'], function () {
 
                 });
 
-                Route::prefix('wallet')->controller(WalletController::class)->group(function () {
-                    Route::post('/transfer/visa', 'transferToVisa');
-                    Route::get('/', 'index');
+                // Route::prefix('wallet')->controller(WalletController::class)->group(function () {
+                //     Route::post('/transfer/visa', 'transferToVisa');
+                //     Route::get('/', 'index');
 
+                // });
+
+                Route::prefix('withdraw-requests')->group(function () {
+                    Route::post('/', [WithdrawRequestController::class, 'store']);
+                    Route::get('/', [WithdrawRequestController::class, 'index']);
+                    Route::get('/user', [WithdrawRequestController::class, 'userRequests']);
+                    Route::get('/{id}', [WithdrawRequestController::class, 'show']);
+                });
+
+                Route::prefix('invoices')->group(function () {
+                    Route::get('/', [TransactionController::class, 'index']);
+                    Route::get('/wallet-info', [TransactionController::class, 'walletInfo']);
                 });
 
                 Route::prefix('meetings')->group(function () {

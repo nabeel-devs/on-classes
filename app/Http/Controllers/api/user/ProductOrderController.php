@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\user;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +52,29 @@ class ProductOrderController extends Controller
             $productOwner->save();
 
             $order->items()->create($item);
+
+            Transaction::create([
+                'user_id' => $productOwner->id,
+                'amount' => $totalPrice,
+                'status' => 'success',
+                'description' => 'Product purchase',
+                'type' => 'credit',
+            ]);
+
+            $user->bought_products()->attach($product->id, [
+                'quantity' => $item['quantity'],
+                'purchase_price' => $item['price'],
+                'order_id' => $order->id,
+            ]);
         }
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'amount' => $request->total,
+            'status' => 'success',
+            'description' => 'Products purchase',
+            'type' => 'debit',
+        ]);
 
         return response()->json($order->load('items'), 201);
     }
@@ -98,6 +121,19 @@ class ProductOrderController extends Controller
             'message' => 'Invalid discount code for this product.',
         ], 400);
     }
+
+    public function userProducts(Request $request)
+    {
+        $user = auth()->user();
+
+        // Retrieve the user's products along with the pivot data (quantity, purchase_price, order_id)
+        $products = $user->bought_products()
+                        ->withPivot('quantity', 'purchase_price', 'order_id')
+                        ->get();
+
+        return response()->json($products);
+    }
+
 
 
 
