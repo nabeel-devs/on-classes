@@ -21,6 +21,7 @@ class PostController extends Controller
         $posts = Post::with('media', 'likes', 'comments.user', 'user')
         ->where('is_story', false)
         ->where('type', '!=', 'reel')
+        ->orderBy('created_at', 'desc')
         ->paginate(20);
 
         if (auth()->check()) {
@@ -62,6 +63,7 @@ class PostController extends Controller
         $posts = Post::with('media', 'likes', 'comments.user', 'user')
         ->where('is_story', false)
         ->where('type', '!=', 'reel')
+        ->orderBy('created_at', 'desc')
         ->paginate(20);
 
 
@@ -78,6 +80,7 @@ class PostController extends Controller
             ->where('user_id', $user->id)
             ->where('is_story', false)
             ->where('type', '!=', 'reel')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
             if (auth()->check()) {
@@ -253,6 +256,7 @@ class PostController extends Controller
         $posts = Post::with('media', 'likes', 'comments.user', 'user')
         ->where('type', 'reel')
         ->where('is_story', false)
+        ->orderBy('created_at', 'desc')
         ->paginate(20);
 
         if (auth()->check()) {
@@ -295,6 +299,7 @@ class PostController extends Controller
             ->where('user_id', $user->id)
             ->where('type', 'reel')
             ->where('is_story', false)
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
             if (auth()->check()) {
@@ -336,6 +341,7 @@ class PostController extends Controller
         $posts = Post::with('media', 'likes', 'comments.user', 'user')
         ->where('is_story', true)
         ->where('type', '!=', 'reel')
+        ->orderBy('created_at', 'desc')
         ->paginate(20);
 
         if (auth()->check()) {
@@ -378,12 +384,14 @@ class PostController extends Controller
             'posts' => function ($query) {
                 $query->where('is_story', true)
                     ->where('type', '!=', 'reel')
+                    ->orderBy('created_at', 'desc') // Order posts by created_at descending
                     ->with('media', 'likes', 'comments.user');
             }
         ])->whereHas('posts', function ($query) {
             $query->where('is_story', true)
                 ->where('type', '!=', 'reel');
         })->paginate(20);
+
 
         // If the user is authenticated, check likes and bookmarks
         if (auth()->check()) {
@@ -424,6 +432,7 @@ class PostController extends Controller
             ->where('user_id', $user->id)
             ->where('is_story', true)
             ->where('type', '!=', 'reel')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
             if (auth()->check()) {
@@ -473,6 +482,7 @@ class PostController extends Controller
             ->whereIn('user_id', $followingIds)
             ->where('is_story', false)
             ->where('type', '!=', 'reel')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         if (auth()->check()) {

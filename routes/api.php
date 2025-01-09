@@ -48,6 +48,12 @@ Route::group(['prefix' => 'user'], function () {
         Route::get('/{contact}', 'show')->name('contacts.show');
     });
 
+    Route::prefix('profile')->group(function () {
+
+        Route::get('/{user}/profile-info', [ProfileController::class, 'showUserProfile']);
+
+    });
+
     Route::get('/all-posts', [PostController::class, 'allPosts']);
 
 
@@ -67,12 +73,13 @@ Route::group(['prefix' => 'user'], function () {
             Route::get('/subscription/plans', [App\Http\Controllers\api\user\SubscriptionController::class, 'getPlans']);
 
 
+            Route::get('/all-creators', [App\Http\Controllers\api\user\UserController::class, 'allCreators']);
+            Route::get('/top-creators', [App\Http\Controllers\api\user\UserController::class, 'topCreators']);
 
 
             Route::prefix('profile')->group(function () {
 
                 Route::get('/', [ProfileController::class, 'show']);
-                Route::get('/{user}/profile-info', [ProfileController::class, 'showUserProfile']);
 
                 Route::post('/dp', [ProfileController::class, 'uploadDp']);
                 Route::post('/online-status', [ProfileController::class, 'updateOnlineStatus']);
@@ -186,6 +193,7 @@ Route::group(['prefix' => 'user'], function () {
 
             Route::prefix('products-feed')->controller(ProductFeedController::class)->group(function () {
                 Route::get('/all', 'index');
+                Route::get('/popular', 'popular');
                 Route::get('/{categoryId}/products', 'categoryProducts');
 
             });
