@@ -23,11 +23,12 @@ class UserController extends Controller
         $allCreators = User::with('products')
             ->where('role', 'creator')
             ->withCount('products') // Count the number of products
-            ->where('products_count', '>', 1) // Filter creators with more than 1 product
+            ->havingRaw('products_count > ?', [1]) // Use havingRaw for PostgreSQL compatibility
             ->orderBy('products_count', 'desc')
             ->get();
 
         return UserResource::collection($allCreators);
     }
+
 
 }
