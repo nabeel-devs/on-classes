@@ -20,12 +20,14 @@ class UserController extends Controller
 
     public function topCreators()
     {
-        $allCreators = User::with('products')->where('role', 'creator')
-            ->withCount('products') // Count the number of reviews
-            ->having('products_count', '>', 1) // Filter for products with more than 1 review
+        $allCreators = User::with('products')
+            ->where('role', 'creator')
+            ->withCount('products') // Count the number of products
+            ->where('products_count', '>', 1) // Filter creators with more than 1 product
             ->orderBy('products_count', 'desc')
             ->get();
 
         return UserResource::collection($allCreators);
     }
+
 }
