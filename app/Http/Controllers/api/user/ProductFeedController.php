@@ -17,15 +17,18 @@ class ProductFeedController extends Controller
 
     public function popular()
     {
-        // Fetch products with more than one review, order by the count of reviews
+        // Fetch all products and count reviews
         $products = Product::with(['user', 'category', 'media', 'reviews.user'])
             ->withCount('reviews') // Count the number of reviews
-            ->having('reviews_count', '>', 1) // Filter for products with more than 1 review
-            ->orderBy('reviews_count', 'desc') // Order by review count, descending
-            ->get();
+            ->orderBy('reviews_count', 'desc') // Order by review count
+            ->get()
+            ->filter(function ($product) {
+                return $product->reviews_count > 1; // Filter for products with more than 1 review
+            });
 
         return ProductResource::collection($products);
     }
+
 
     public function categoryProducts($categoryId)
     {
