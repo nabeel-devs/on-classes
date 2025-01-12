@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\creator;
 
 use App\Models\Course;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\creator\CourseResource;
@@ -60,4 +61,7 @@ class CourseController extends Controller
         $course->delete();
         return response()->noContent();
     }
+
+
+
 }

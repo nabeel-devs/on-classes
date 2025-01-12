@@ -30,6 +30,7 @@ use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
 use App\Http\Controllers\api\creator\TransactionController;
 use App\Http\Controllers\api\creator\WithdrawRequestController;
+use App\Http\Controllers\api\user\UserController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -225,12 +226,16 @@ Route::group(['prefix' => 'user'], function () {
 
             Route::middleware(['creator'])->group(function () {
 
+                Route::get('/creator/info/{user}', [UserController::class, 'creatorInfo']);
+
                 Route::prefix('courses')->controller(CourseController::class)->group(function () {
                     Route::get('/', 'index');
                     Route::post('/', 'store');
                     Route::get('/{course}', 'show');
                     Route::put('/{course}', 'update');
                     Route::delete('/{course}', 'destroy');
+
+
 
                 });
 
