@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Follow;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\user\UserResource;
 
 class FollowController extends Controller
 {
@@ -61,8 +62,18 @@ class FollowController extends Controller
     {
         $followers = auth()->user()->followers()->with('follower')->get();
 
-        return response()->json($followers);
+        $followersData = $followers->map(function ($follower) {
+            return [
+                'id' => $follower->id,
+                'follower_id' => $follower->follower_id,
+                'following_id' => $follower->following_id,
+                'follower' => new UserResource($follower->follower),
+            ];
+        });
+
+        return response()->json($followersData);
     }
+
 
     public function getFollowings()
     {
