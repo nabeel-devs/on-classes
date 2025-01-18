@@ -7,6 +7,8 @@ use Stripe\FinancialConnections\Transaction;
 use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\user\ChatController;
 use App\Http\Controllers\api\user\PostController;
+use App\Http\Controllers\api\user\UserController;
+use App\Http\Controllers\api\user\EventController;
 use App\Http\Controllers\api\user\FollowController;
 use App\Http\Controllers\api\user\ContactController;
 use App\Http\Controllers\api\user\DiplomaController;
@@ -30,7 +32,6 @@ use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
 use App\Http\Controllers\api\creator\TransactionController;
 use App\Http\Controllers\api\creator\WithdrawRequestController;
-use App\Http\Controllers\api\user\UserController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -158,6 +159,14 @@ Route::group(['prefix' => 'user'], function () {
                 Route::delete('bookmarks/{bookmark}', [PostBookmarkController::class, 'destroy']);
             });
 
+            Route::prefix('events')->group(function () {
+
+                Route::post('/', [EventController::class, 'createEvent']); // Create an event
+                Route::post('/{event}/members', [EventController::class, 'addMember']); // Add a member
+                Route::post('/{event}/token', [EventController::class, 'generateToken']); // Generate Agora token
+                Route::post('/call-log', [EventController::class, 'logCall']); // Log a call
+
+            });
 
             Route::prefix('chats')->group(function () {
 

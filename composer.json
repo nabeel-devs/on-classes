@@ -7,16 +7,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "ext-gd": "*",
         "ext-bcmath": "*",
         "ext-exif": "*",
+        "ext-gd": "*",
         "laravel/cashier": "^15.5",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
-        "spatie/laravel-medialibrary": "^11.10"
+        "spatie/laravel-medialibrary": "^11.10",
+        "taylanunutmaz/agora-token-builder": "^1.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
