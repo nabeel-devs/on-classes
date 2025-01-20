@@ -39,8 +39,12 @@ class UserProfileResource extends JsonResource
         'links' => UserLinkResource::collection($this->whenLoaded('links')),
 
         // If you have both images and videos in the posts, use a collection
-        'images' => PostResource::collection($this->whenLoaded('posts')->where('type', 'image')),
-        'videos' => PostResource::collection($this->whenLoaded('posts')->where('type', 'video')),
+        'images' => $this->whenLoaded('posts') instanceof \Illuminate\Database\Eloquent\Collection
+            ? PostResource::collection($this->posts->where('type', 'image'))
+            : [],
+        'videos' => $this->whenLoaded('posts') instanceof \Illuminate\Database\Eloquent\Collection
+            ? PostResource::collection($this->posts->where('type', 'video'))
+            : [],
     ];
 }
 

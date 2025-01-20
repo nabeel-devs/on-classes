@@ -162,6 +162,7 @@ Route::group(['prefix' => 'user'], function () {
             Route::prefix('events')->group(function () {
 
                 Route::post('/', [EventController::class, 'createEvent']); // Create an event
+                Route::get('/users/{user}', [EventController::class, 'userProfile']); // Create an event
                 Route::post('/{event}/members', [EventController::class, 'addMember']); // Add a member
                 Route::post('/{event}/token', [EventController::class, 'generateToken']); // Generate Agora token
                 Route::post('/call-log', [EventController::class, 'logCall']); // Log a call

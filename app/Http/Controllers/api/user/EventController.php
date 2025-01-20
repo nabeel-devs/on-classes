@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\api\user;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Event;
 use App\Models\Member;
 use App\Models\CallLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\user\UserResource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\user\UserProfileResource;
 use TaylanUnutmaz\AgoraTokenBuilder\RtcTokenBuilder;
 
 class EventController extends Controller
@@ -97,5 +100,10 @@ class EventController extends Controller
         $callLog = CallLog::create($request->all());
 
         return response()->json(['message' => 'Call log created successfully', 'call_log' => $callLog], 201);
+    }
+
+    public function userProfile(User $user)
+    {
+        return new UserResource($user);
     }
 }
