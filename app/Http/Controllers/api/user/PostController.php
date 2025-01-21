@@ -73,6 +73,20 @@ class PostController extends Controller
     }
 
 
+    public function userNonAuthPosts(User $user)
+    {
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+            ->where('user_id', $user->id)
+            ->where('is_story', false)
+            ->where('type', '!=', 'reel')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+
+        return PostResource::collection($posts);
+    }
+
+
 
     public function userPosts(User $user)
     {

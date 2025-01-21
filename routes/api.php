@@ -62,6 +62,7 @@ Route::group(['prefix' => 'user'], function () {
     });
 
     Route::get('/all-posts', [PostController::class, 'allPosts']);
+    Route::get('/all-posts/{user}', [PostController::class, 'userNonAuthPosts']);
 
 
     Route::middleware(['auth'])->group(function () {
