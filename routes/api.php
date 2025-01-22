@@ -83,6 +83,7 @@ Route::group(['prefix' => 'user'], function () {
 
             Route::get('/all-creators', [App\Http\Controllers\api\user\UserController::class, 'allCreators']);
             Route::get('/top-creators', [App\Http\Controllers\api\user\UserController::class, 'topCreators']);
+            Route::delete('/delete-user/{user}', [App\Http\Controllers\api\user\UserController::class, 'destroy']);
 
 
             Route::prefix('profile')->group(function () {
