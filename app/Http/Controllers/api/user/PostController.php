@@ -355,6 +355,7 @@ class PostController extends Controller
         $posts = Post::with('media', 'likes', 'comments.user', 'user')
         ->where('is_story', true)
         ->where('type', '!=', 'reel')
+        ->where('status', 'active')
         ->orderBy('created_at', 'desc')
         ->paginate(20);
 
@@ -398,6 +399,7 @@ class PostController extends Controller
             'posts' => function ($query) {
                 $query->where('is_story', true)
                     ->where('type', '!=', 'reel')
+                    ->where('status', 'active')
                     ->orderBy('created_at', 'desc') // Order posts by created_at descending
                     ->with('media', 'likes', 'comments.user');
             }
@@ -446,6 +448,7 @@ class PostController extends Controller
             ->where('user_id', $user->id)
             ->where('is_story', true)
             ->where('type', '!=', 'reel')
+            ->where('status', 'active')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -500,6 +503,53 @@ class PostController extends Controller
             ->paginate(20);
 
         if (auth()->check()) {
+            // Get liked and bookmarked post IDs
+            $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Transform each post in the collection
+            $posts->getCollection()->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                if (!($post instanceof \App\Models\Post)) {
+                    throw new \Exception('Expected Post instance but got ' . get_class($post));
+                }
+
+                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+
+                return $post;
+            });
+        }
+
+        return PostResource::collection($posts);
+    }
+
+
+
+    public function getBookmarkedPosts(User $user)
+    {
+
+        // Get the IDs of users the auth user follows
+        $bookmarkedIds = DB::table('post_bookmarks')
+            ->where('user_id', $user->id)
+            ->pluck('post_id');
+
+        // Fetch posts from followed users
+        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+            ->whereIn('id', $bookmarkedIds)
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        if (auth()->check()) {
+            $authUserId = auth()->id();
             // Get liked and bookmarked post IDs
             $likedPostIds = DB::table('post_likes')
                 ->where('is_liked', true)

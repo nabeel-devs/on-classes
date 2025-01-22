@@ -146,6 +146,7 @@ Route::group(['prefix' => 'user'], function () {
                 Route::get('/{user}/posts', 'userPosts');
                 Route::get('/{user}/reels', 'userReels');
                 Route::get('/{user}/stories', 'userStories');
+                Route::get('/{user}/bookmarks', 'getBookmarkedPosts');
 
             });
             Route::prefix('posts')->group(function () {
