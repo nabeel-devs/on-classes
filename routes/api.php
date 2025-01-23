@@ -23,6 +23,8 @@ use App\Http\Controllers\api\creator\WalletController;
 use App\Http\Controllers\api\creator\InsightController;
 use App\Http\Controllers\api\creator\MeetingController;
 use App\Http\Controllers\api\creator\ProductController;
+use App\Http\Controllers\api\user\CourseFeedController;
+use App\Http\Controllers\api\user\CourseOrderController;
 use App\Http\Controllers\api\user\PostCommentController;
 use App\Http\Controllers\api\user\ProductFeedController;
 use App\Http\Controllers\api\user\NotificationController;
@@ -217,6 +219,13 @@ Route::group(['prefix' => 'user'], function () {
 
             });
 
+            Route::prefix('courses-feed')->controller(CourseFeedController::class)->group(function () {
+                Route::get('/all', 'index');
+                Route::get('/{course}/show', 'show');
+                Route::get('/{categoryId}/courses', 'categoryCourses');
+
+            });
+
             Route::prefix('products-orders')->controller(ProductOrderController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::post('/', 'store');
@@ -224,6 +233,16 @@ Route::group(['prefix' => 'user'], function () {
 
                 Route::post('/verify-discount-code', 'verifyDiscountCode');
                 Route::get('/{product}', 'show');
+
+            });
+
+            Route::prefix('courses-orders')->controller(CourseOrderController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/user/bought-courses', 'userCourses');
+
+                Route::post('/verify-discount-code', 'verifyDiscountCode');
+                Route::get('/{course}', 'show');
 
             });
 

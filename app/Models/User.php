@@ -169,6 +169,14 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
                     ->withTimestamps();
     }
 
+
+    public function bought_courses()
+    {
+        return $this->belongsToMany(Course::class, 'user_courses')
+                    ->withPivot('quantity', 'purchase_price', 'course_order_id')
+                    ->withTimestamps();
+    }
+
     public function participants()
     {
         return $this->hasMany(MeetingParticipant::class);

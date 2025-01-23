@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreCourseOrderRequest;
+use App\Http\Resources\creator\CourseResource;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class CourseOrderController extends Controller
@@ -61,11 +62,11 @@ class CourseOrderController extends Controller
                 'type' => 'credit',
             ]);
 
-            // $user->bought_products()->attach($course->id, [
-            //     'quantity' => $item['quantity'],
-            //     'purchase_price' => $item['price'],
-            //     'order_id' => $order->id,
-            // ]);
+            $user->bought_courses()->attach($course->id, [
+                'quantity' => $item['quantity'],
+                'purchase_price' => $item['price'],
+                'course_order_id' => $order->id,
+            ]);
         }
 
         Transaction::create([
@@ -96,7 +97,7 @@ class CourseOrderController extends Controller
             return response()->json(['error' => $validator->errors()], 400);
         }
 
-        $course = Course::find($request->product_id);
+        $course = Course::find($request->course_id);
 
         if ($course->discount_code && $course->discount_code === $request->discount_code) {
             if ($course->is_discounted) {
@@ -119,16 +120,17 @@ class CourseOrderController extends Controller
         ], 400);
     }
 
-    // public function userCourses(Request $request)
-    // {
-    //     $user = auth()->user();
+    public function userCourses(Request $request)
+    {
+        $user = auth()->user();
 
-    //     $courses = $user->bought_courses()
-    //                     ->withPivot('quantity', 'purchase_price', 'course_order_id')
-    //                     ->get();
+        $courses = $user->bought_courses()
+                        ->with(['modules.lessons', 'user','category', 'media'])
+                        ->withPivot('quantity', 'purchase_price', 'course_order_id')
+                        ->get();
 
-    //     return response()->json($courses);
-    // }
+        return CourseResource::collection($courses);
+    }
 
 
 }

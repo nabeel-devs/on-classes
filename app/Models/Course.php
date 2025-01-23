@@ -33,4 +33,11 @@ class Course extends Model implements HasMedia
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_courses')
+                    ->withPivot('quantity', 'purchase_price', 'course_order_id')
+                    ->withTimestamps();
+    }
 }

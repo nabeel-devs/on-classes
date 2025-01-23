@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreOrderRequest;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\creator\ProductResource;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class ProductOrderController extends Controller
@@ -128,11 +129,13 @@ class ProductOrderController extends Controller
 
         // Retrieve the user's products along with the pivot data (quantity, purchase_price, order_id)
         $products = $user->bought_products()
+                        ->with(['user', 'category', 'media']) // Add eager loading here
                         ->withPivot('quantity', 'purchase_price', 'order_id')
                         ->get();
 
-        return response()->json($products);
+        return ProductResource::collection($products);
     }
+
 
 
 
