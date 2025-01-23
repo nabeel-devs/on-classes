@@ -19,11 +19,25 @@ class LoginRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'email' => 'required|string|email',
-            'password' => 'required|string|min:8',
+            'email' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'password' => 'required|string|min:8|max:255',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'email.required' => 'The email or username field is required.',
+            'email.string' => 'The email or username must be a valid string.',
+            'password.required' => 'The password field is required.',
+            'password.min' => 'The password must be at least 6 characters.',
         ];
     }
 }
