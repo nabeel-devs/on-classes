@@ -15,6 +15,11 @@ class ProductFeedController extends Controller
         return ProductResource::collection($products);
     }
 
+    public function show(Product $product)
+    {
+        return new ProductResource($product->load(['user', 'category', 'media', 'reviews.user']));
+    }
+
     public function popular()
     {
         // Fetch all products and count reviews

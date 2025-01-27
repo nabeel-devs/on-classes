@@ -214,6 +214,7 @@ Route::group(['prefix' => 'user'], function () {
 
             Route::prefix('products-feed')->controller(ProductFeedController::class)->group(function () {
                 Route::get('/all', 'index');
+                Route::get('/{product}/show', 'show');
                 Route::get('/popular', 'popular');
                 Route::get('/{categoryId}/products', 'categoryProducts');
 
