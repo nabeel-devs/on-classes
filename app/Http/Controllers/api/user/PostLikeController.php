@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Models\PostLike;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Notifications\PostLikeNotification;
+use Illuminate\Support\Facades\Notification;
 
 class PostLikeController extends Controller
 {
@@ -15,6 +17,7 @@ class PostLikeController extends Controller
             'is_liked' => 'required|boolean',
         ]);
 
+        $user = _user();
         $like = PostLike::where('post_id', $post->id)
                     ->where('user_id', _user()->id)
                     ->first();
@@ -31,6 +34,8 @@ class PostLikeController extends Controller
             ]);
         }
 
+
+        Notification::send($post->user, new PostLikeNotification($post, $user));
         // Count total likes for the post
         $likeCount = PostLike::where('post_id', $post->id)
                             ->where('is_liked', true)

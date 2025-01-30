@@ -2,12 +2,22 @@
 
 namespace App\Models;
 
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Message extends Model
+class Message extends Model implements HasMedia
 {
+    use InteractsWithMedia;
 
     protected $guarded = [];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('media')
+             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'video/mp4'])
+             ->singleFile();
+    }
 
     public function chat()
     {

@@ -20,7 +20,7 @@ class MessageController extends Controller
 
         // Fetch messages in descending order by created_at
         $messages = $chat->messages()
-            ->with('sender')
+            ->with(['media', 'sender'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -38,16 +38,25 @@ class MessageController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $request->validate(['content' => 'required|string|max:1000']);
-
-        $message = Message::create([
-            'chat_id' => $chat->id,
-            'sender_id' => $user->id,
-            'content' => $request->content,
+        $request->validate([
+            'content' => 'nullable|string|max:1000',
+            'media'   => 'nullable|file|mimes:jpeg,png,mp4|max:10240', // Max 10MB
         ]);
 
-        return response()->json($message, 201);
+        $message = Message::create([
+            'chat_id'   => $chat->id,
+            'sender_id' => $user->id,
+            'content'   => $request->content,
+        ]);
+
+        // Handle media file upload
+        if ($request->hasFile('media')) {
+            $message->addMedia($request->file('media'))->toMediaCollection('media');
+        }
+
+        return response()->json($message->load('media'), 201);
     }
+
 
     // Mark a message as read
     public function markAsRead(Message $message)

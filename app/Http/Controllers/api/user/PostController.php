@@ -441,6 +441,63 @@ class PostController extends Controller
     }
 
 
+    public function getSpotlightStories()
+    {
+        // Get the user with the highest number of followers who also has stories
+        $topUser = User::withCount('followers') // Count followers for each user
+            ->whereHas('posts', function ($query) {
+                $query->where('is_story', true)
+                    ->where('type', '!=', 'reel')
+                    ->where('status', 'active');
+            })
+            ->orderByDesc('followers_count') // Order by most followers
+            ->first(); // Get only one user
+
+        if (!$topUser) {
+            return response()->json(['message' => 'No stories available'], 404);
+        }
+
+        // Load stories for the top user
+        $topUser->load([
+            'posts' => function ($query) {
+                $query->where('is_story', true)
+                    ->where('type', '!=', 'reel')
+                    ->where('status', 'active')
+                    ->orderBy('created_at', 'desc')
+                    ->with('media', 'likes', 'comments.user');
+            }
+        ]);
+
+        // If the user is authenticated, check likes and bookmarks
+        if (auth()->check()) {
+            $authUserId = auth()->id();
+
+            $likedPostIds = DB::table('post_likes')
+                ->where('is_liked', true)
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            $bookmarkedPostIds = DB::table('post_bookmarks')
+                ->where('is_bookmarked', true)
+                ->where('user_id', $authUserId)
+                ->pluck('post_id')
+                ->toArray();
+
+            // Add liked and bookmarked status
+            $topUser->posts->transform(function ($post) use ($likedPostIds, $bookmarkedPostIds) {
+                $post->liked_by_auth_user = in_array($post->id, $likedPostIds);
+                $post->bookmarked_by_auth_user = in_array($post->id, $bookmarkedPostIds);
+                return $post;
+            });
+        }
+
+        // Return only the top user's stories
+        return new UserStoryResource($topUser);
+    }
+
+
+
 
     public function userStories(User $user)
     {

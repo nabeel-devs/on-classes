@@ -7,6 +7,8 @@ use App\Models\Follow;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\user\UserResource;
+use App\Notifications\FollowNotification;
+use Illuminate\Support\Facades\Notification;
 
 class FollowController extends Controller
 {
@@ -34,7 +36,10 @@ class FollowController extends Controller
             'following_id' => $user->id,
         ]);
 
-        return response()->json(['message' => "You are now following {$user->name}."]);
+        Notification::send($user, new FollowNotification($currentUser));
+
+
+        return response()->json(['message' => "You are now following {$user->fullName()}."]);
     }
 
 
@@ -54,7 +59,7 @@ class FollowController extends Controller
         // Delete the follow record
         $follow->delete();
 
-        return response()->json(['message' => "You have unfollowed {$user->name}."]);
+        return response()->json(['message' => "You have unfollowed {$user->fullName()}."]);
     }
 
 

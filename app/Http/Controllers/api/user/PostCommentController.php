@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Models\PostComment;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\PostCommentNotification;
 
 class PostCommentController extends Controller
 {
@@ -19,11 +21,16 @@ class PostCommentController extends Controller
             return response()->json(['message' => 'Post not found.'], 404);
         }
 
+        $user = _user();
+
         $comment = PostComment::create([
             'post_id' => $post->id,
             'user_id' => _user()->id,
             'comment' => $request->comment,
         ]);
+
+        Notification::send($post->user, new PostCommentNotification($post, $user));
+
 
         return response()->json([
             'message' => 'Comment added successfully.',

@@ -140,6 +140,7 @@ Route::group(['prefix' => 'user'], function () {
                 Route::get('/reels', 'getReels');
                 Route::get('/stories', 'getStories');
                 Route::get('/stories/updated', 'getStoriesUpdated');
+                Route::get('/spotlight/stories', 'getSpotlightStories');
                 Route::get('/following-posts', 'getFollowingPosts');
                 Route::post('/', 'store');
                 Route::get('/{post}', 'show');
