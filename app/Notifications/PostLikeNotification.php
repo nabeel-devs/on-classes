@@ -39,6 +39,8 @@ class PostLikeNotification extends Notification
         return [
             'type' => 'like',
             'post_id' => $this->post->id,
+            'user_dp' => $this->user->getDpUrl(),
+            'user' => $this->user,
             'message' => "{$this->user->fullName()} has liked your post."
         ];
     }
@@ -52,6 +54,8 @@ class PostLikeNotification extends Notification
             'type' => 'like', // Corrected type to 'like'
             'post_id' => $this->post->id,
             'user_id' => $this->user->id, // Added user_id for reference
+            'user_dp' => $this->user->getDpUrl(),
+            'user' => $this->user,
             'message' => "{$this->user->fullName()} has liked your post."
         ];
     }

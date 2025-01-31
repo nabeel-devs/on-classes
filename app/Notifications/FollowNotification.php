@@ -38,6 +38,8 @@ class FollowNotification extends Notification
         return [
             'type' => 'follow',
             'user_id' => $this->user->id,
+            'user_dp' => $this->user->getDpUrl(),
+            'user' => $this->user,
             'message' => "{$this->user->fullName()} has started following you."
         ];
     }
@@ -50,6 +52,8 @@ class FollowNotification extends Notification
         return [
             'type' => 'follow',
             'user_id' => $this->user->id,
+            'user_dp' => $this->user->getDpUrl(),
+            'user' => $this->user,
             'message' => "{$this->user->fullName()} has started following you."
         ];
     }
