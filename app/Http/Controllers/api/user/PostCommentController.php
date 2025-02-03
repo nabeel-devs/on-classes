@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\PostComment;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\user\CommentResource;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\PostCommentNotification;
 
@@ -15,6 +16,7 @@ class PostCommentController extends Controller
     {
         $request->validate([
             'comment' => 'required|string|max:500',
+            'comment_id' => 'nullable|exists:post_comments,id', // Validate comment_id for replies
         ]);
 
         if (!$post) {
@@ -25,18 +27,27 @@ class PostCommentController extends Controller
 
         $comment = PostComment::create([
             'post_id' => $post->id,
-            'user_id' => _user()->id,
+            'user_id' => $user->id,
             'comment' => $request->comment,
+            'comment_id' => $request->comment_id, // Store parent comment ID if it's a reply
         ]);
 
-        Notification::send($post->user, new PostCommentNotification($post, $user));
-
+        // Notify post owner or parent comment owner
+        if ($request->comment_id) {
+            $parentComment = PostComment::find($request->comment_id);
+            if ($parentComment) {
+                Notification::send($parentComment->user, new PostCommentNotification($post, $user));
+            }
+        } else {
+            Notification::send($post->user, new PostCommentNotification($post, $user));
+        }
 
         return response()->json([
             'message' => 'Comment added successfully.',
-            'data' => $comment,
+            'data' => new CommentResource($comment->load('user', 'replies')),
         ], 201);
     }
+
 
     // Delete a comment
     public function destroy(PostComment $comment)

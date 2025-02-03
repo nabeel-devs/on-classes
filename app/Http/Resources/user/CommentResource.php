@@ -19,9 +19,11 @@ class CommentResource extends JsonResource
             'id' => $this->id,
             'comment' => $this->comment,
             'user_id' => $this->user_id,
+            'comment_id' => $this->comment_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => new UserResource($this->whenLoaded('user')),
+            'replies' => CommentResource::collection($this->whenLoaded('replies')),
         ];
     }
 }

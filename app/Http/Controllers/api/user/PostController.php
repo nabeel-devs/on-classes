@@ -18,7 +18,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
         ->where('is_story', false)
         ->where('type', '!=', 'reel')
         ->orderBy('created_at', 'desc')
@@ -60,7 +60,7 @@ class PostController extends Controller
 
     public function allPosts()
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
         ->where('is_story', false)
         ->where('type', '!=', 'reel')
         ->orderBy('created_at', 'desc')
@@ -75,7 +75,7 @@ class PostController extends Controller
 
     public function userNonAuthPosts(User $user)
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
             ->where('user_id', $user->id)
             ->where('is_story', false)
             ->where('type', '!=', 'reel')
@@ -90,7 +90,7 @@ class PostController extends Controller
 
     public function userPosts(User $user)
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
             ->where('user_id', $user->id)
             ->where('is_story', false)
             ->where('type', '!=', 'reel')
@@ -216,7 +216,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         // Load the relationships that you need for the post (media, likes, comments, and user)
-        $post->load('media', 'likes', 'comments.user', 'user');
+        $post->load('media', 'likes', 'comments.user', 'comments.replies.user', 'user');
 
         // Check if the user is authenticated and has liked or bookmarked the post
         if (auth()->check()) {
@@ -267,7 +267,7 @@ class PostController extends Controller
 
     public function getReels()
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
         ->where('type', 'reel')
         ->where('is_story', false)
         ->orderBy('created_at', 'desc')
@@ -309,7 +309,7 @@ class PostController extends Controller
 
     public function userReels(User $user)
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
             ->where('user_id', $user->id)
             ->where('type', 'reel')
             ->where('is_story', false)
@@ -352,7 +352,7 @@ class PostController extends Controller
 
     public function getStories()
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
         ->where('is_story', true)
         ->where('type', '!=', 'reel')
         ->where('status', 'active')
@@ -401,7 +401,7 @@ class PostController extends Controller
                     ->where('type', '!=', 'reel')
                     ->where('status', 'active')
                     ->orderBy('created_at', 'desc') // Order posts by created_at descending
-                    ->with('media', 'likes', 'comments.user');
+                    ->with('media', 'likes', 'comments.user', 'comments.replies.user');
             }
         ])->whereHas('posts', function ($query) {
             $query->where('is_story', true)
@@ -464,7 +464,7 @@ class PostController extends Controller
                     ->where('type', '!=', 'reel')
                     ->where('status', 'active')
                     ->orderBy('created_at', 'desc')
-                    ->with('media', 'likes', 'comments.user');
+                    ->with('media', 'likes', 'comments.user', 'comments.replies.user');
             }
         ]);
 
@@ -501,7 +501,7 @@ class PostController extends Controller
 
     public function userStories(User $user)
     {
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
             ->where('user_id', $user->id)
             ->where('is_story', true)
             ->where('type', '!=', 'reel')
@@ -552,7 +552,7 @@ class PostController extends Controller
             ->pluck('following_id');
 
         // Fetch posts from followed users
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
             ->whereIn('user_id', $followingIds)
             ->where('is_story', false)
             ->where('type', '!=', 'reel')
@@ -600,7 +600,7 @@ class PostController extends Controller
             ->pluck('post_id');
 
         // Fetch posts from followed users
-        $posts = Post::with('media', 'likes', 'comments.user', 'user')
+        $posts = Post::with('media', 'likes', 'comments.user', 'comments.replies.user', 'user')
             ->whereIn('id', $bookmarkedIds)
             ->orderBy('created_at', 'desc')
             ->paginate(20);

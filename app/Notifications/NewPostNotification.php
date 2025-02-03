@@ -30,6 +30,8 @@ class NewPostNotification extends Notification implements ShouldBroadcast, Shoul
         return [
             'type' => 'post',
             'post_id' => $this->post->id,
+            'user_dp' => $this->post->user->getDpUrl(),
+            'user' => $this->post->user,
             'message' => "A new post has been created."
         ];
     }
@@ -39,6 +41,8 @@ class NewPostNotification extends Notification implements ShouldBroadcast, Shoul
         return [
             'type' => 'post',
             'post_id' => $this->post->id,
+            'user_dp' => $this->post->user->getDpUrl(),
+            'user' => $this->post->user,
             'message' => "A new post has been created."
         ];
     }

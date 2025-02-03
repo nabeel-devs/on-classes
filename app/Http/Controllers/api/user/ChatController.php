@@ -50,7 +50,7 @@ class ChatController extends Controller
                 $query->where('user1_id', $user->id)
                     ->orWhere('user2_id', $user->id);
             })
-            ->with(['user1', 'user2', 'messages' => function ($query) {
+            ->with(['user1', 'user2', 'messages.media' => function ($query) {
                 $query->orderBy('created_at', 'desc');  // Order messages by latest
             }])
             ->get();
@@ -79,7 +79,7 @@ class ChatController extends Controller
                 $query->where('user1_id', $user->id)
                     ->orWhere('user2_id', $user->id);
             })
-            ->with(['user1', 'user2', 'messages' => function ($query) {
+            ->with(['user1', 'user2', 'messages.media' => function ($query) {
                 $query->orderBy('created_at', 'desc');  // Order messages by latest
             }])
             ->get();
@@ -189,7 +189,7 @@ class ChatController extends Controller
         }
 
         // Load the users and messages in descending order by created_at
-        $chat->load(['user1', 'user2', 'messages' => function ($query) {
+        $chat->load(['user1', 'user2', 'messages.media' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
