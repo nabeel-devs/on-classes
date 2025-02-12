@@ -34,6 +34,7 @@ use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
 use App\Http\Controllers\api\creator\TransactionController;
 use App\Http\Controllers\api\creator\WithdrawRequestController;
+use App\Http\Controllers\CommentLikeController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -155,6 +156,7 @@ Route::group(['prefix' => 'user'], function () {
             Route::prefix('posts')->group(function () {
                 Route::post('{post}/comments', [PostCommentController::class, 'store']);
                 Route::delete('comments/{comment}', [PostCommentController::class, 'destroy']);
+                Route::post('comments/{comment}/likes', [CommentLikeController::class, 'store']);
 
                 // Post Likes
                 Route::post('{post}/likes', [PostLikeController::class, 'store']);

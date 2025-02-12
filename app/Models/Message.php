@@ -17,6 +17,10 @@ class Message extends Model implements HasMedia
         $this->addMediaCollection('media')
              ->acceptsMimeTypes(['image/jpeg', 'image/png', 'video/mp4'])
              ->singleFile();
+
+        $this->addMediaCollection('audio')
+        ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
+        ->singleFile();
     }
 
     public function chat()

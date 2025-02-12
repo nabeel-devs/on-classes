@@ -28,4 +28,9 @@ class PostComment extends Model
     {
         return $this->belongsTo(PostComment::class, 'comment_id');
     }
+
+    public function likes()
+    {
+        return $this->hasMany(CommentLike::class);
+    }
 }

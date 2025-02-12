@@ -134,7 +134,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $post = Post::create(
-            $request->except('media') + ['user_id' => _user()->id]
+            $request->except(['media', 'music']) + ['user_id' => _user()->id]
         );
 
         ini_set('upload_max_filesize', '100M');
@@ -143,6 +143,10 @@ class PostController extends Controller
 
         if ($request->hasFile('media')) {
             $post->addMedia($request->file('media'))->toMediaCollection('posts');
+        }
+
+        if ($request->hasFile('music')) {
+            $post->addMedia($request->file('music'))->toMediaCollection('music');
         }
 
         dispatch(new NewPostNotificationJob($post));

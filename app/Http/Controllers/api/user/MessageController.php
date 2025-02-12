@@ -20,7 +20,7 @@ class MessageController extends Controller
 
         // Fetch messages in descending order by created_at
         $messages = $chat->messages()
-            ->with(['media', 'sender'])
+            ->with(['media','audio', 'sender'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -41,6 +41,7 @@ class MessageController extends Controller
         $request->validate([
             'content' => 'nullable|string|max:1000',
             'media'   => 'nullable|file|mimes:jpeg,png,mp4|max:10240', // Max 10MB
+            'audio'   => 'nullable|file|mimes:wav,mpeg|max:5120', // Max 5MB
         ]);
 
         $message = Message::create([
@@ -54,8 +55,18 @@ class MessageController extends Controller
             $message->addMedia($request->file('media'))->toMediaCollection('media');
         }
 
-        return response()->json($message->load('media'), 201);
+        // Handle audio file upload
+        if ($request->hasFile('audio')) {
+            $message->addMedia($request->file('audio'))->toMediaCollection('audio');
+        }
+
+        return response()->json([
+            'message' => $message->load(['media', 'audio']), // Load both media and audio
+            'media'   => $message->getFirstMediaUrl('media'), // Get media URL
+            'audio'   => $message->getFirstMediaUrl('audio'), // Get audio URL
+        ], 201);
     }
+
 
 
     // Mark a message as read
