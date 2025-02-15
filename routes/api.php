@@ -34,6 +34,7 @@ use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
 use App\Http\Controllers\api\creator\TransactionController;
 use App\Http\Controllers\api\creator\WithdrawRequestController;
+use App\Http\Controllers\AudioController;
 use App\Http\Controllers\CommentLikeController;
 
 Route::group(['prefix' => 'user'], function () {
@@ -66,6 +67,10 @@ Route::group(['prefix' => 'user'], function () {
 
     Route::get('/all-posts', [PostController::class, 'allPosts']);
     Route::get('/all-posts/{user}', [PostController::class, 'userNonAuthPosts']);
+
+    Route::post('/audio/create', [AudioController::class, 'store']);
+    Route::get('/audio/get', [AudioController::class, 'index']);
+    Route::get('/audio/get/{audio}', [AudioController::class, 'show']);
 
 
     Route::middleware(['auth'])->group(function () {
