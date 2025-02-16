@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\User;
+use App\Models\Follow;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,12 +41,13 @@ class FollowNotification extends Notification
             'user_id' => $this->user->id,
             'user_dp' => $this->user->getDpUrl(),
             'user' => $this->user,
-            'message' => "{$this->user->fullName()} has started following you."
+            'message' => "{$this->user->fullName()} has started following you.",
+            'is_following_back' => $this->isFollowingBack($notifiable) // Check follow back status
         ];
     }
 
     /**
-     * Get the database representation of the notification.
+     * Store notification in the database.
      */
     public function toDatabase($notifiable)
     {
@@ -54,7 +56,18 @@ class FollowNotification extends Notification
             'user_id' => $this->user->id,
             'user_dp' => $this->user->getDpUrl(),
             'user' => $this->user,
-            'message' => "{$this->user->fullName()} has started following you."
+            'message' => "{$this->user->fullName()} has started following you.",
+            'is_following_back' => $this->isFollowingBack($notifiable) // Check follow back status
         ];
+    }
+
+    /**
+     * Check if the notifiable user is following back.
+     */
+    private function isFollowingBack($notifiable)
+    {
+        return Follow::where('follower_id', $notifiable->id)
+            ->where('following_id', $this->user->id)
+            ->exists();
     }
 }

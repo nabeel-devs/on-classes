@@ -12,7 +12,8 @@ class AudioController extends Controller
     {
         $validator = Validator::make($request->all(),[
             'name' => 'required|string',
-            'description' => 'required|string'
+            'description' => 'required|string',
+            'audio' => 'nullable|file|max:5120',
         ]);
         $audio = Audio::create($request->except('audio'));
 
@@ -31,9 +32,9 @@ class AudioController extends Controller
         return response()->json($audios);
     }
 
-    public function show(Audio $audio)
+    public function showAudio(Audio $audio)
     {
-        $audio = Audio::with('media')->findOrFail($audio);
+        $audio->load('media'); // Load media relationship
 
         return response()->json($audio);
     }

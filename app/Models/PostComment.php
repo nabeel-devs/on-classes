@@ -20,7 +20,7 @@ class PostComment extends Model
     // A comment may have replies
     public function replies()
     {
-        return $this->hasMany(PostComment::class, 'comment_id');
+        return $this->hasMany(PostComment::class, 'comment_id')->with('replies');
     }
 
     // A reply belongs to a parent comment

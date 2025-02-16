@@ -41,7 +41,8 @@ class MessageController extends Controller
         $request->validate([
             'content' => 'nullable|string|max:1000',
             'media'   => 'nullable|file|mimes:jpeg,png,mp4|max:10240', // Max 10MB
-            'audio'   => 'nullable|file|mimes:wav,mpeg|max:5120', // Max 5MB
+            'audio' => 'nullable|file|max:5120',
+
         ]);
 
         $message = Message::create([
@@ -61,10 +62,11 @@ class MessageController extends Controller
         }
 
         return response()->json([
-            'message' => $message->load(['media', 'audio']), // Load both media and audio
+            'message' => $message, // Return the message model without `load()`
             'media'   => $message->getFirstMediaUrl('media'), // Get media URL
             'audio'   => $message->getFirstMediaUrl('audio'), // Get audio URL
         ], 201);
+
     }
 
 

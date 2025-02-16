@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Follow;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,7 +42,8 @@ class PostLikeNotification extends Notification
             'post_id' => $this->post->id,
             'user_dp' => $this->user->getDpUrl(),
             'user' => $this->user,
-            'message' => "{$this->user->fullName()} has liked your post."
+            'message' => "{$this->user->fullName()} has liked your post.",
+            'is_following' => $this->isFollowing($notifiable) // Check follow status
         ];
     }
 
@@ -56,8 +58,16 @@ class PostLikeNotification extends Notification
             'user_id' => $this->user->id, // Added user_id for reference
             'user_dp' => $this->user->getDpUrl(),
             'user' => $this->user,
-            'message' => "{$this->user->fullName()} has liked your post."
+            'message' => "{$this->user->fullName()} has liked your post.",
+            'is_following' => $this->isFollowing($notifiable) // Check follow status
         ];
+    }
+
+    private function isFollowing($notifiable)
+    {
+        return Follow::where('follower_id', $notifiable->id)
+            ->where('following_id', $this->user->id)
+            ->exists();
     }
 
 }

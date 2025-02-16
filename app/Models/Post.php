@@ -24,7 +24,6 @@ class Post extends Model implements HasMedia
              ->singleFile();
 
         $this->addMediaCollection('music')
-             ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
              ->singleFile();
     }
 
@@ -36,8 +35,9 @@ class Post extends Model implements HasMedia
 
     public function comments()
     {
-        return $this->hasMany(PostComment::class);
+        return $this->hasMany(PostComment::class)->whereNull('comment_id')->with('replies');
     }
+
 
     public function likes()
     {

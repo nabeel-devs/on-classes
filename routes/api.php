@@ -69,8 +69,9 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/all-posts/{user}', [PostController::class, 'userNonAuthPosts']);
 
     Route::post('/audio/create', [AudioController::class, 'store']);
-    Route::get('/audio/get', [AudioController::class, 'index']);
-    Route::get('/audio/get/{audio}', [AudioController::class, 'show']);
+    Route::get('/audio/get-audio/{audio}', [AudioController::class, 'showAudio']);
+
+    Route::get('/audio/all', [AudioController::class, 'index']);
 
 
     Route::middleware(['auth'])->group(function () {

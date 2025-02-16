@@ -19,7 +19,6 @@ class Message extends Model implements HasMedia
              ->singleFile();
 
         $this->addMediaCollection('audio')
-        ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
         ->singleFile();
     }
 

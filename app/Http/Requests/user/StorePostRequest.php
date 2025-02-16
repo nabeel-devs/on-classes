@@ -23,6 +23,7 @@ class StorePostRequest extends FormRequest
             'scheduled_at' => 'nullable|date',
             'is_story' => 'required',
             'media' => 'nullable|file|mimes:jpeg,png,jpg,mp4|max:20480',
+            'audio' => 'nullable|file|max:5120',
         ];
     }
 }

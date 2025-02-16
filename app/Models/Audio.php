@@ -18,7 +18,6 @@ class Audio extends Model implements HasMedia
     {
 
         $this->addMediaCollection('audio')
-             ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
              ->singleFile();
     }
 }
