@@ -33,7 +33,10 @@ class PostResource extends JsonResource
             'liked_by_auth_user' => $this->liked_by_auth_user ?? false,
             'bookmarked_by_auth_user' => $this->bookmarked_by_auth_user ?? false,
             'user' => new UserResource($this->whenLoaded('user')),
-            'likes' => $this->likes->count(),
+            'likes' => [
+                'count' => $this->likes->count(),
+                'users' => UserResource::collection($this->whenLoaded('likes')->pluck('user'))
+            ],
             'comments' => CommentResource::collection($this->whenLoaded('comments')),
         ];
     }

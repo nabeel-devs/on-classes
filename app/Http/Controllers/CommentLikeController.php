@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\CommentLike;
 use App\Models\PostComment;
 use Illuminate\Http\Request;

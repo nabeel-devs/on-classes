@@ -41,7 +41,7 @@ class Post extends Model implements HasMedia
 
     public function likes()
     {
-        return $this->hasMany(PostLike::class);
+        return $this->hasMany(PostLike::class, 'post_id')->where('is_liked', true);
     }
 
     public function bookmarks()
