@@ -75,8 +75,14 @@ class SubscriptionController extends Controller
     public function getPlans()
     {
         $plans = [
-            'monthly' => config('services.stripe.monthly'),
-            'yearly' => config('services.stripe.yearly'),
+            'monthly' => [
+                'id' => config('services.stripe.monthly.id'),
+                'price' => config('services.stripe.monthly.price'),
+            ],
+            'yearly' => [
+                'id' => config('services.stripe.yearly.id'),
+                'price' => config('services.stripe.yearly.price'),
+            ],
         ];
 
         return response()->json([
@@ -84,6 +90,7 @@ class SubscriptionController extends Controller
             'plans' => $plans,
         ], 200);
     }
+
 
 
 }

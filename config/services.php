@@ -39,8 +39,14 @@ return [
         'model' => App\Models\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
-        'monthly' => env('STRIPE_MONTHLY', 'price_1QMberBlnzMP4RT6imS2JO53'),
-        'yearly' => env('STRIPE_ANNUALY', 'price_1QMbcZBlnzMP4RT6xswi1CpQ'),
+        'monthly' => [
+            'id' => env('STRIPE_MONTHLY_PLAN_ID', 'price_1QMberBlnzMP4RT6imS2JO53'),
+            'price' => env('STRIPE_MONTHLY_PRICE', 99), // Example: 9.99
+        ],
+        'yearly' => [
+            'id' => env('STRIPE_YEARLY_PLAN_ID', 'price_1QMbcZBlnzMP4RT6xswi1CpQ'),
+            'price' => env('STRIPE_YEARLY_PRICE', 999), // Example: 99.99
+        ],
     ],
 
     'google' => [
