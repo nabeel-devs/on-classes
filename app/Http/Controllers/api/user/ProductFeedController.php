@@ -17,8 +17,15 @@ class ProductFeedController extends Controller
 
     public function show(Product $product)
     {
-        return new ProductResource($product->load(['user', 'category', 'media', 'reviews.user']));
+        $user = auth()->user();
+
+        // Check if the authenticated user has bought this product
+        $hasBought = $user ? $user->bought_products()->where('product_id', $product->id)->exists() : false;
+
+        return (new ProductResource($product->load(['user', 'category', 'media', 'reviews.user'])))
+                    ->additional(['has_bought' => $hasBought]);
     }
+
 
     public function popular()
     {

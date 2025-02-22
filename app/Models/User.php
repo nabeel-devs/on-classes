@@ -76,6 +76,10 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
         $this->addMediaCollection('dp')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/jpg'])
             ->singleFile();
+
+        $this->addMediaCollection('cover')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/jpg'])
+            ->singleFile();
     }
 
     public function registerMediaConversions(Media $media = null): void
@@ -114,6 +118,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
     public function getDpUrl($conversion = 'preview'): string
     {
         return $this->getFirstMediaUrl('dp', $conversion) ?: asset('assets/img/default-dp.png');
+    }
+
+    public function getCover(): string
+    {
+        return $this->getFirstMediaUrl('cover') ?: asset('assets/img/default-dp.png');
     }
 
 

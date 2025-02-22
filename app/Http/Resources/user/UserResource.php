@@ -32,7 +32,11 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'dp_url' => $this->getDpUrl(), // Display Picture URL
+            'is_following' => auth()->check()
+                ? auth()->user()->followings()->where('following_id', $this->id)->exists()
+                : false,
+            'dp_url' => $this->getDpUrl(),
+            'cover' => $this->getCover(),
         ];
     }
 }

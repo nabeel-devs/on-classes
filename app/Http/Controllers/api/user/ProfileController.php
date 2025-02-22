@@ -66,6 +66,10 @@ class ProfileController extends Controller
             $user->addMediaFromRequest('dp')->toMediaCollection('dp');
         }
 
+        if ($request->hasFile('cover')) {
+            $user->addMediaFromRequest('cover')->toMediaCollection('cover');
+        }
+
         // Save the updated user data
         $user->save();
 

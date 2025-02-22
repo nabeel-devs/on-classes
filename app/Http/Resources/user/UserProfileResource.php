@@ -34,6 +34,7 @@ class UserProfileResource extends JsonResource
         'created_at' => $this->created_at,
         'updated_at' => $this->updated_at,
         'dp_url' => $this->getDpUrl(),
+        'cover' => $this->getCover(),
 
         // Load links and return as a collection
         'links' => UserLinkResource::collection($this->whenLoaded('links')),
