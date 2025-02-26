@@ -22,7 +22,7 @@ class SubscriptionController extends Controller
 
         try {
             $user->newSubscription('default', $planId)->create($paymentMethod);
-
+            $user->update(['role' => 'creator']);
             return response()->json([
                 'success' => true,
                 'message' => 'Subscription created successfully.',

@@ -20,9 +20,13 @@ class MessageController extends Controller
 
         // Fetch messages in descending order by created_at
         $messages = $chat->messages()
-            ->with(['media','audio', 'sender'])
+            ->with(['media', 'sender']) // Remove 'audio'
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->each(function ($message) {
+                // Add audio files manually from the media library
+                $message->audio = $message->getMedia('audio');
+            });
 
         return response()->json($messages);
     }
