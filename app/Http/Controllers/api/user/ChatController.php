@@ -194,39 +194,38 @@ class ChatController extends Controller
 
 
     public function show(Chat $chat)
-    {
-        $user = _user();
+{
+    $user = _user();
 
-        // Ensure the user is part of the chat
-        if ($chat->user1_id !== $user->id && $chat->user2_id !== $user->id) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
-        // Load the users and messages in descending order by created_at
-        $chat->load([
-            'user1',
-            'user2',
-            'messages.media' => function ($query) {
-                $query->orderBy('created_at', 'desc');
-            },
-            'messages.audio' => function ($query) {
-                $query->orderBy('created_at', 'desc');
-            }
-        ]);
-
-
-        return response()->json([
-            'chats' => [
-                [
-                    'id' => $chat->id,
-                    'user1' => new UserResource($chat->user1),
-                    'user2' => new UserResource($chat->user2),
-                    'messages' => $chat->messages,
-                    'created_at' => $chat->created_at,
-                ]
-            ]
-        ]);
+    // Ensure the user is part of the chat
+    if ($chat->user1_id !== $user->id && $chat->user2_id !== $user->id) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
+
+    // Load chat users and messages
+    $chat->load(['user1', 'user2', 'messages']);
+
+    return response()->json([
+        'chats' => [
+            [
+                'id' => $chat->id,
+                'user1' => new UserResource($chat->user1),
+                'user2' => new UserResource($chat->user2),
+                'messages' => $chat->messages->map(function ($message) {
+                    return [
+                        'id' => $message->id,
+                        'text' => $message->text,
+                        'media' => $message->getMedia('media')->map(fn($media) => $media->getUrl()),
+                        'audio' => $message->getMedia('audio')->map(fn($media) => $media->getUrl()),
+                        'created_at' => $message->created_at,
+                    ];
+                }),
+                'created_at' => $chat->created_at,
+            ]
+        ]
+    ]);
+}
+
 
 
     public function quickChat()
