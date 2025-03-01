@@ -214,7 +214,9 @@ class ChatController extends Controller
                 'messages' => $chat->messages->map(function ($message) {
                     return [
                         'id' => $message->id,
-                        'text' => $message->text,
+                        'content' => $message->content,
+                        'sender_id' => $message->sender_id,
+                        'chat_id' => $message->chat_id,
                         'media' => $message->getMedia('media')->map(fn($media) => $media->getUrl()),
                         'audio' => $message->getMedia('audio')->map(fn($media) => $media->getUrl()),
                         'created_at' => $message->created_at,
