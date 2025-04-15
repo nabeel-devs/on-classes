@@ -35,6 +35,7 @@ class UserProfileResource extends JsonResource
         'updated_at' => $this->updated_at,
         'dp_url' => $this->getDpUrl(),
         'cover' => $this->getCover(),
+        'is_subscribed' => $this->subscribed('default'),
 
         // Load links and return as a collection
         'links' => UserLinkResource::collection($this->whenLoaded('links')),

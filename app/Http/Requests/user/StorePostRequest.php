@@ -20,6 +20,7 @@ class StorePostRequest extends FormRequest
             'content' => 'required|string',
             'type' => 'required|in:text,image,video,product,course,reel',
             'who_can_reply' => 'required|in:everyone,verified_accounts,only_community',
+            'who_can_see' => 'required|in:everyone,verified_accounts,only_community,subscribers',
             'scheduled_at' => 'nullable|date',
             'is_story' => 'required',
             'media' => 'nullable|file|mimes:jpeg,png,jpg,mp4|max:20480',

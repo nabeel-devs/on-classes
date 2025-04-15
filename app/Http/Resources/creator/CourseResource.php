@@ -36,6 +36,12 @@ class CourseResource extends JsonResource
             'category' => new CategoryResource($this->whenLoaded('category')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'bookmarked_by_auth_user' => $this->relationLoaded('bookmarks') && $this->bookmarks->isNotEmpty(),
+            'purchased_by_auth_user' => $this->relationLoaded('orderItems') && $this->orderItems->contains(function ($item) {
+                return $item->order && $item->order->user_id === auth()->id();
+            }),
+
+
         ];
     }
 }

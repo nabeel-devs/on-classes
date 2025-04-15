@@ -22,6 +22,7 @@ class PostResource extends JsonResource
             'content' => $this->content,
             'type' => $this->type,
             'who_can_reply' => $this->who_can_reply,
+            'who_can_see' => $this->who_can_see,
             'scheduled_at' => $this->scheduled_at,
             'media_url' => $this->getFirstMediaUrl('posts'),
             'music_url' => $this->getFirstMediaUrl('music'),

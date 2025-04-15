@@ -117,7 +117,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
 
     public function getDpUrl($conversion = 'preview'): string
     {
-        return $this->getFirstMediaUrl('dp', $conversion) ?: asset('assets/img/default-dp.png');
+        return $this->getFirstMediaUrl('dp') ?: asset('assets/img/default-dp.png');
     }
 
     public function getCover(): string

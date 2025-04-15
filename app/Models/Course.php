@@ -40,4 +40,29 @@ class Course extends Model implements HasMedia
                     ->withPivot('quantity', 'purchase_price', 'course_order_id')
                     ->withTimestamps();
     }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(CourseBookmark::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasManyThrough(
+            CourseOrder::class,
+            CourseOrderItem::class,
+            'course_id',        // Foreign key on CourseOrderItem
+            'id',               // Local key on CourseOrder
+            'id',               // Local key on Course
+            'course_order_id'   // Foreign key on CourseOrderItem
+        );
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(CourseOrderItem::class);
+    }
+
+
+
 }

@@ -32,6 +32,7 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'is_subscribed' => $this->subscribed('default'),
             'is_following' => auth()->check()
                 ? auth()->user()->followings()->where('following_id', $this->id)->exists()
                 : false,

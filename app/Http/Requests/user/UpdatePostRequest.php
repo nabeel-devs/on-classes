@@ -20,6 +20,8 @@ class UpdatePostRequest extends FormRequest
             'content' => 'nullable|string',
             'type' => 'nullable|in:text,image,video,product,course',
             'who_can_reply' => 'nullable|in:everyone,verified_accounts,only_community',
+            'who_can_see' => 'nullable|in:everyone,verified_accounts,only_community,subscribers',
+            'is_story' => 'nullable|boolean',
             'scheduled_at' => 'nullable|date',
             'media' => 'nullable|file|mimes:jpeg,png,jpg,mp4|max:20480',
             'status' => 'nullable|in:active,inactive',

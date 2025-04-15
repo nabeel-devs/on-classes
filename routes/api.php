@@ -1,14 +1,18 @@
 <?php
 
+use App\Models\Course;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AudioController;
 use Stripe\FinancialConnections\Transaction;
+use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\user\ChatController;
 use App\Http\Controllers\api\user\PostController;
 use App\Http\Controllers\api\user\UserController;
 use App\Http\Controllers\api\user\EventController;
+use App\Http\Controllers\CourseBookmarkController;
 use App\Http\Controllers\api\user\FollowController;
 use App\Http\Controllers\api\user\ContactController;
 use App\Http\Controllers\api\user\DiplomaController;
@@ -34,8 +38,6 @@ use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
 use App\Http\Controllers\api\creator\TransactionController;
 use App\Http\Controllers\api\creator\WithdrawRequestController;
-use App\Http\Controllers\AudioController;
-use App\Http\Controllers\CommentLikeController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -109,6 +111,9 @@ Route::group(['prefix' => 'user'], function () {
 
             });
 
+            Route::get('popular/products-and-reels', [ProductFeedController::class, 'popular']);
+
+
             Route::prefix('diplomas')->group(function () {
 
                 Route::get('/', [DiplomaController::class, 'index']);
@@ -150,6 +155,7 @@ Route::group(['prefix' => 'user'], function () {
                 Route::get('/spotlight/stories', 'getSpotlightStories');
                 Route::get('/following-posts', 'getFollowingPosts');
                 Route::post('/', 'store');
+                Route::patch('/{post}/toggle-commenting', 'toggleCommenting');
                 Route::get('/{post}', 'show');
                 Route::put('/{post}', 'update');
                 Route::delete('/{post}', 'destroy');
@@ -224,10 +230,13 @@ Route::group(['prefix' => 'user'], function () {
             Route::prefix('products-feed')->controller(ProductFeedController::class)->group(function () {
                 Route::get('/all', 'index');
                 Route::get('/{product}/show', 'show');
-                Route::get('/popular', 'popular');
+                // Route::get('/popular', 'popular');
                 Route::get('/{categoryId}/products', 'categoryProducts');
 
             });
+
+            Route::post('courses-feed/{course}/bookmarks', [CourseBookmarkController::class, 'store']);
+            Route::delete('courses-feed/bookmarks/{bookmark}', [CourseBookmarkController::class, 'destroy']);
 
             Route::prefix('courses-feed')->controller(CourseFeedController::class)->group(function () {
                 Route::get('/all', 'index');
@@ -235,6 +244,8 @@ Route::group(['prefix' => 'user'], function () {
                 Route::get('/{categoryId}/courses', 'categoryCourses');
 
             });
+
+
 
             Route::prefix('products-orders')->controller(ProductOrderController::class)->group(function () {
                 Route::get('/', 'index');
@@ -280,6 +291,7 @@ Route::group(['prefix' => 'user'], function () {
 
 
                 });
+
 
                 Route::prefix('modules')->controller(ModuleController::class)->group(function () {
                     Route::get('/', 'index');

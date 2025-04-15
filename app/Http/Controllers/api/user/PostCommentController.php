@@ -14,6 +14,10 @@ class PostCommentController extends Controller
 {
     public function store(Request $request, Post $post)
     {
+        if (!$post->commenting_enabled) {
+            return response()->json(['message' => 'Commenting is disabled for this post.'], 403);
+        }
+
         $request->validate([
             'comment' => 'required|string|max:500',
             'comment_id' => 'nullable|exists:post_comments,id', // Validate comment_id for replies
