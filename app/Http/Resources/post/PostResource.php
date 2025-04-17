@@ -17,7 +17,7 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'content' => $this->content,
             'type' => $this->type,
@@ -40,6 +40,20 @@ class PostResource extends JsonResource
             ],
             'comments' => CommentResource::collection($this->whenLoaded('comments')),
         ];
+
+        // Add poll information if the post is a poll
+        if ($this->is_poll) {
+            $data['poll'] = [
+                'is_poll' => true,
+                'options' => $this->poll_options,
+                'end_at' => $this->poll_end_at,
+                'results' => $this->getPollResults(),
+                'has_voted' => auth()->check() ? $this->hasUserVoted(auth()->user()) : false,
+                'user_vote' => auth()->check() ? $this->getUserVote(auth()->user())?->option : null,
+            ];
+        }
+
+        return $data;
     }
 
 }

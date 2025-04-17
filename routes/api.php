@@ -38,6 +38,7 @@ use App\Http\Controllers\api\user\ProductReviewController;
 use App\Http\Controllers\api\creator\ParticipantController;
 use App\Http\Controllers\api\creator\TransactionController;
 use App\Http\Controllers\api\creator\WithdrawRequestController;
+use App\Http\Controllers\api\user\PollVoteController;
 
 Route::group(['prefix' => 'user'], function () {
 
@@ -177,6 +178,10 @@ Route::group(['prefix' => 'user'], function () {
                 // Post Bookmarks
                 Route::post('{post}/bookmarks', [PostBookmarkController::class, 'store']);
                 Route::delete('bookmarks/{bookmark}', [PostBookmarkController::class, 'destroy']);
+
+                Route::post('poll/{post}/vote', [PollVoteController::class, 'store']);
+                Route::put('poll/{post}/vote', [PollVoteController::class, 'update']);
+                Route::delete('poll/{post}/vote', [PollVoteController::class, 'destroy']);
             });
 
             Route::prefix('events')->group(function () {
@@ -371,6 +376,9 @@ Route::group(['prefix' => 'user'], function () {
 
         });
     });
+
+    // Poll voting routes
+
 });
 
 

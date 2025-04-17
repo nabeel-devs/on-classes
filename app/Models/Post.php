@@ -14,7 +14,10 @@ class Post extends Model implements HasMedia
     protected $guarded = [];
 
     protected $casts = [
-        'is_story' => 'bool'
+        'is_story' => 'bool',
+        'is_poll' => 'bool',
+        'poll_options' => 'array',
+        'poll_end_at' => 'datetime'
     ];
 
     public function registerMediaCollections(): void
@@ -47,5 +50,42 @@ class Post extends Model implements HasMedia
     public function bookmarks()
     {
         return $this->hasMany(PostBookmark::class);
+    }
+
+    public function pollVotes()
+    {
+        return $this->hasMany(PollVote::class);
+    }
+
+    public function hasUserVoted(User $user)
+    {
+        return $this->pollVotes()->where('user_id', $user->id)->exists();
+    }
+
+    public function getUserVote(User $user)
+    {
+        return $this->pollVotes()->where('user_id', $user->id)->first();
+    }
+
+    public function getPollResults()
+    {
+        if (!$this->is_poll) {
+            return null;
+        }
+
+        $results = [];
+        $totalVotes = $this->pollVotes()->count();
+
+        foreach ($this->poll_options as $option) {
+            $votes = $this->pollVotes()->where('option', $option)->count();
+            $percentage = $totalVotes > 0 ? round(($votes / $totalVotes) * 100) : 0;
+
+            $results[$option] = [
+                'votes' => $votes,
+                'percentage' => $percentage
+            ];
+        }
+
+        return $results;
     }
 }
