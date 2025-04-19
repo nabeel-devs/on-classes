@@ -29,6 +29,7 @@ class StorePostRequest extends FormRequest
             'poll_options' => 'required_if:is_poll,true|array|min:2|max:10',
             'poll_options.*' => 'required|string|max:100',
             'poll_end_at' => 'nullable|date|after:now',
+            'commenting_enabled' => 'nullable|boolean',
         ];
     }
 }
