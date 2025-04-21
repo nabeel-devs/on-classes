@@ -6,6 +6,7 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\creator\CourseResource;
+use Illuminate\Support\Facades\Auth;
 
 class CourseFeedController extends Controller
 {
@@ -17,10 +18,10 @@ class CourseFeedController extends Controller
             'category',
             'media',
             'bookmarks' => function ($q) {
-                $q->where('user_id', auth()->id())->where('is_bookmarked', true);
+                $q->where('user_id', auth()->user()->id)->where('is_bookmarked', true);
             },
             'orderItems.order' => function ($q) {
-                $q->where('user_id', auth()->id());
+                $q->where('user_id', auth()->user()->id);
             }
         ])->get();
 
